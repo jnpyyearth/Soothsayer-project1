@@ -7,14 +7,14 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
   // สร้าง autocomplete suggestions จาก data
   const allKeywords = [
     ...new Set([
-      // ...data.map((r) => r.PLANT),
-      ...data.map((r) => r.MACHINE),
-      ...data.map((r) => r.COMPONENT),
-      ...data.map((r) => r.MODEL),
+      ...data.map((r) => r.PLANT).filter(Boolean),
+      ...data.map((r) => r.MACHINE).filter(Boolean),
+      ...data.map((r) => r.COMPONENT).filter(Boolean),
+      ...data.map((r) => r.MODEL).filter(Boolean),
       // ...data.map((r) => r.HEALTHSCORE),
       // ...data.map((r) => r.Actual_Value),
-      ...data.map((r) => r.UNITS),
-    ].filter(Boolean)),
+      ...data.map((r) => r.UNITS).filter(Boolean),
+    ]),
   ];
 
   const suggestions = searchTerm
@@ -23,29 +23,31 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
       )
     : [];
 
-  return (
-    <div className="flex items-center justify-start px-6 py-4 gap-20 overflow-x-auto">
+ return (
+  <div className="px-6 py-4">
 
-      {/* logo click to form */}
+    {/* logo อยู่บรรทัดแรก */}
+     <div className="flex justify-center items-center h-24">
       <img
         src={logoImage}
-        className="relative ml-20 py-6 cursor-pointer"
+        className="ml-20 py-6 cursor-pointer "
         id="logolink"
         alt="logosoothsayer"
-        onClick={onLogoClick} // เมื่อคลิกโลโก้ จะเรียกใช้ฟังก์ชันนี้
+        onClick={onLogoClick}
       />
-
-      {/* searchbar  */}
-     <div className="relative w-[400px]"> 
-        <SearchBar
-          className="w-full"
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          suggestions={suggestions}
-        />
-      </div>
     </div>
-  );
+
+    {/* searchbar อยู่บรรทัดถัดมา */}
+    <div className="relative w-[400px]">
+      <SearchBar
+        className="w-full"
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        suggestions={suggestions}
+      />
+    </div>
+  </div>
+);
 }
 
 export default Header;

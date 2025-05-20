@@ -3,6 +3,7 @@ import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { UserGroupIcon, CalendarIcon, UserIcon ,ChatBubbleLeftEllipsisIcon  } from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
+import SearchBar from "../search/search";
 import Badge from "@mui/material/Badge";
 import MailIcon from "@mui/icons-material/Mail";
 import Pagination from "@mui/material/Pagination";
@@ -43,9 +44,9 @@ function Table() {
   const [action, setAction] = useState("0");
   const [customCaution, setCustomCaution] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
   const [isClosing, setIsClosing] = useState(false);
+  const pageSize = 25; 
 
   const closeModalWithFade = () => {
     setIsClosing(true);
@@ -243,21 +244,14 @@ function Table() {
   const onPageChange = (e, page) => {
     setCurrentPage(page);
 
-    //set ให้ล้างตัวที่เลือกหากกดเลือกหน้าต่อไป
-    // const startIndex = (page - 1) * pageSize;
-    // const endIndex = startIndex + pageSize - 1;
-    // if (
-    //   selectedRowGlobalIndex === null ||
-    //   selectedRowGlobalIndex < startIndex ||
-    //   selectedRowGlobalIndex > endIndex
-    // ) {
-    //   setSelectedRowGlobalIndex(null);
-    // }
   };
 
   return (
-    <div className="px-4 py-2 ">
-      <div className="md:w-auto flex-col md:flex-row space-y-2 md:space-y-0 z-100  align-top">
+    <div className={{overflowX: "visible", width: "100%", overflowY: "visible", height: "100%" }}>
+      <div
+        className="md:w-auto flex-col md:flex-row space-y-2 
+      md:space-y-0 z-100  align-top"
+      >
         <Header
           onLogoClick={handleLogoClick}
           data={data}
@@ -267,26 +261,11 @@ function Table() {
         />
       </div>
 
-      <div className="mb-4 flex items-center gap-2">
-        <label htmlFor="pageSizeSelect" className="font-medium">
-          Rows per page:
-        </label>
-        <select
-          id="pageSizeSelect"
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(parseInt(e.target.value));
-            setCurrentPage(1);
-          }}
-          className="border rounded px-2 py-1 bg-black text-white border-white"
-        >
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
-        </select>
-      </div>
-
-      <table className="font-custom table-auto border-collapse border text-sm border-gray-300 mt-4 min-w-full">
+      <table
+        className="font-custom table-auto border-collapse border text-sm border-gray-300 
+        mt-4 w-full"style={{ tableLayout: "auto" }}
+      >
+        
         <thead className="bg-headtable-gradient text-sm text-teal-50 ">
           <tr>
             <th className="border border-black text-sm">
@@ -597,9 +576,11 @@ function Table() {
                             <UserIcon className="w-5 h-5 inline-block " />
                             <strong>Machine Diagnostic Engineer</strong> :
                           </p>
-                          <p className="inline-flex items-center rounded-md bg-blue-800 
+                          <p
+                            className="inline-flex items-center rounded-md bg-blue-800 
                           px-4 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 
-                          ring-inset my-2 mx-8">
+                          ring-inset my-2 mx-8"
+                          >
                             {" "}
                             {tooltip.engineer}
                           </p>
@@ -686,16 +667,20 @@ function Table() {
                                   <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1">
                                     <ChatBubbleLeftEllipsisIcon className="w-6 h-6 inline-block" />
                                     <strong> Note: </strong>
-                                    <span className="inline-flex items-center rounded-md
+                                    <span
+                                      className="inline-flex items-center rounded-md
                                      bg-green-600 px-2 py-1 text-xs font-medium text-white 
-                                     ring-1 ring-gray-500/10 ring-inset ml-1">
+                                     ring-1 ring-gray-500/10 ring-inset ml-1"
+                                    >
                                       {noteText}
                                     </span>
                                   </p>
                                 </div>
                               );
                               const htmlString =
-                                ReactDOMServer.renderToStaticMarkup(htmlContent);
+                                ReactDOMServer.renderToStaticMarkup(
+                                  htmlContent
+                                );
 
                               Swal.fire({
                                 position: "top-end",
@@ -711,7 +696,8 @@ function Table() {
                                 // timer: null,
                                 timer: 3000,
                                 customClass: {
-                                  popup: "relative shadow-md text-sm text-start",
+                                  popup:
+                                    "relative shadow-md text-sm text-start",
                                   closeButton:
                                     "absolute top-2 right-2 text-white text-lg",
                                 },
@@ -753,10 +739,15 @@ function Table() {
           >
             <h3 className="text-lg font-semibold mb-4">Edit Action Row</h3>
             <div className="mb-4">
-              <label className="block font-medium mb-1 text-start">Select Action:</label>
+              <label className="block font-medium mb-1 text-start">
+                Select Action:
+              </label>
 
               <div className="flex flex-col gap-2">
-                <label htmlFor="action-acknowledge" className="flex items-center gap-2 cursor-pointer">
+                <label
+                  htmlFor="action-acknowledge"
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <input
                     id="action-acknowledge"
                     type="radio"
@@ -768,7 +759,10 @@ function Table() {
                   />
                   Acknowledge
                 </label>
-                <label htmlFor="action-followup" className="flex items-center gap-2 cursor-pointer">
+                <label
+                  htmlFor="action-followup"
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <input
                     id="action-followup"
                     type="radio"
@@ -780,7 +774,10 @@ function Table() {
                   />
                   Follow-up
                 </label>
-                <label htmlFor="action-custom" className="flex items-center gap-2 cursor-pointer">
+                <label
+                  htmlFor="action-custom"
+                  className="flex items-center gap-2 cursor-pointer"
+                >
                   <input
                     id="action-custom"
                     type="radio"
@@ -797,7 +794,9 @@ function Table() {
 
             {action === "custom" && (
               <div className="mb-4">
-                <label className="block font-medium mb-1 text-start">Enter Custom Caution Value:</label>
+                <label className="block font-medium mb-1 text-start">
+                  Enter Custom Caution Value:
+                </label>
                 <textarea
                   className="w-full border border-gray-300 bg-white rounded px-3 py-2 text-black"
                   value={customCaution}

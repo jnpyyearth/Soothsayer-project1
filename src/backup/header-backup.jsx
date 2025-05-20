@@ -23,7 +23,7 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
       )
     : [];
 
-  return (
+return (
     <div className="flex items-center justify-start px-6 py-4 gap-20 overflow-x-auto">
 
       {/* logo click to form */}

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import { UserGroupIcon, CalendarIcon, UserIcon } from "@heroicons/react/24/solid";
+import { UserGroupIcon, CalendarIcon, UserIcon ,ChatBubbleLeftEllipsisIcon  } from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
 import Badge from "@mui/material/Badge";
@@ -37,7 +37,7 @@ function useMultipleOutsideClick(dropdowns) {
 
 function Table() {
   const [data, setData] = useState([]);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [selectedRowGlobalIndex, setSelectedRowGlobalIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [note, setNote] = useState("");
   const [action, setAction] = useState("0");
@@ -45,6 +45,15 @@ function Table() {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageSize, setPageSize] = useState(20);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const closeModalWithFade = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setShowModal(false);
+      setIsClosing(false);
+    }, 300);
+  };
 
   const roleMap = {
     GSP1: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
@@ -60,16 +69,12 @@ function Table() {
   const [open, setOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState("Select All Time");
   const dropdownRef = useRef(null);
-
-  // Plant dropdown
   const [plantDropdownOpen, setPlantDropdownOpen] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState("Select All Plants");
   const plantDropdownRef = useRef(null);
-  // Machine dropdown
   const [machineOpen, setmachineopen] = useState(false);
   const [selectedmachine, setSelectedmachine] = useState("Select All Machine");
   const machineRef = useRef(null);
-  // Components dropdown
   const [componentsOpen, setComponentopen] = useState(false);
   const [selectedcomponents, setSelectedcomponents] = useState("Select All Components");
   const componentsRef = useRef(null);
@@ -97,41 +102,39 @@ function Table() {
   useMultipleOutsideClick(dropdowns);
 
   const timeRanges = [
-  "00:00 - 03:59",
-  "04:00 - 07:59",
-  "08:00 - 11:59",
-  "12:00 - 15:59",
-  "16:00 - 19:59",
-  "20:00 - 23:59",
-];
-
-  // ฟังก์ชันกลุ่มช่วงเวลาใหญ่ 6 ช่วง
-  
+    "00:00 - 03:59",
+    "04:00 - 07:59",
+    "08:00 - 11:59",
+    "12:00 - 15:59",
+    "16:00 - 19:59",
+    "20:00 - 23:59",
+  ];
 
   const handleSelectTime = (timeRange) => {
     setSelectedTime(timeRange);
     setOpen(false);
-    setSelectedRowIndex(null);
+    setSelectedRowGlobalIndex(null);
     setCurrentPage(1);
   };
 
   const handleSelectPlant = (plant) => {
     setSelectedPlant(plant);
     setPlantDropdownOpen(false);
-    setSelectedRowIndex(null);
+    setSelectedRowGlobalIndex(null);
     setCurrentPage(1);
   };
 
   const handleSelectmachine = (machine) => {
     setSelectedmachine(machine);
     setmachineopen(false);
-    setSelectedRowIndex(null);
+    setSelectedRowGlobalIndex(null);
     setCurrentPage(1);
   };
 
   const handleSelectcomponent = (component) => {
     setSelectedcomponents(component);
     setComponentopen(false);
+    setSelectedRowGlobalIndex(null);
     setCurrentPage(1);
   };
 
@@ -142,7 +145,6 @@ function Table() {
 
   // กรองข้อมูล
   const filteredData = data.filter((row) => {
-
     const matchTime = isTimeInRange(row.TIME, selectedTime);
     const matchPlant = selectedPlant === "Select All Plants" || row.PLANT === selectedPlant;
     const matchComponent = selectedcomponents === "Select All Components" || row.COMPONENT === selectedcomponents;
@@ -161,12 +163,12 @@ function Table() {
   const uniquePlants = Array.from(new Set(data.map((row) => row.PLANT))).filter(Boolean);
 
   const handleLogoClick = () => {
-    if (selectedRowIndex !== null) {
+    if (selectedRowGlobalIndex !== null) {
       setShowModal(true);
     } else {
       Swal.fire({
-        title: "เลือกแถวก่อนนะครับ",
-        text: "Please select a row before clicking the logo.",
+        title: "เลือกแถวที่ต้องการก่อนนะครับ",
+        text: "Please select a row before click!",
         icon: "warning",
         confirmButtonText: "OK",
         customClass: {
@@ -189,7 +191,7 @@ function Table() {
     fetch("http://localhost:5000/update_row", {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ rowIndex: selectedRowIndex, newCaution, note }),
+      body: new URLSearchParams({ rowIndex: selectedRowGlobalIndex, newCaution, note }),
     })
       .then((res) => res.json())
       .then((result) => {
@@ -197,7 +199,7 @@ function Table() {
           Swal.fire("Saved", `Updated at: ${result.acknowledge_time}`, "success").then(() => {
             fetchData();
             setShowModal(false);
-            setSelectedRowIndex(null);
+            setSelectedRowGlobalIndex(null);
           });
         } else {
           Swal.fire("Error", result.message, "error");
@@ -209,40 +211,53 @@ function Table() {
     <UserGroupIcon className="inline-block w-5 h-5 mr-2 text-white" />
   );
 
-function normalizeTime(timeStr) {
-  if (!timeStr || typeof timeStr !== "string") return null;
-  // ตัดส่วนวันที่ออก โดยใช้ split แล้วเอาส่วนเวลาที่อยู่หลัง
-  const parts = timeStr.trim().split(" ");
-   // ส่วนเวลา เอามาแปลงเป็น 
-  const timePart = parts.length > 1 ? parts[parts.length - 1] : parts[0];
-  const timeParts = timePart.split(":");
-  if (timeParts.length < 2) return null;
-  return timeParts[0].padStart(2, "0") + ":" + timeParts[1].padStart(2, "0");
-}
+  function normalizeTime(timeStr) {
+    if (!timeStr || typeof timeStr !== "string") return null;
+    const parts = timeStr.trim().split(" ");
+    const timePart = parts.length > 1 ? parts[parts.length - 1] : parts[0];
+    const timeParts = timePart.split(":");
+    if (timeParts.length < 2) return null;
+    return timeParts[0].padStart(2, "0") + ":" + timeParts[1].padStart(2, "0");
+  }
 
-function timeToMinutes(timeStr) {
-  const norm = normalizeTime(timeStr);
-  if (!norm) return -1;
-  const [hh, mm] = norm.split(":").map(Number);
-  if (isNaN(hh) || isNaN(mm)) return -1;
-  return hh * 60 + mm;
-}
+  function timeToMinutes(timeStr) {
+    const norm = normalizeTime(timeStr);
+    if (!norm) return -1;
+    const [hh, mm] = norm.split(":").map(Number);
+    if (isNaN(hh) || isNaN(mm)) return -1;
+    return hh * 60 + mm;
+  }
 
-function isTimeInRange(timeStr, rangeLabel) {
-  if (rangeLabel === "Select All Time") return true;
-  const timeMin = timeToMinutes(timeStr);
-  if (timeMin === -1) return false;
+  function isTimeInRange(timeStr, rangeLabel) {
+    if (rangeLabel === "Select All Time") return true;
+    const timeMin = timeToMinutes(timeStr);
+    if (timeMin === -1) return false;
 
-  const [startStr, endStr] = rangeLabel.split(" - ");
-  const startMin = timeToMinutes(startStr);
-  const endMin = timeToMinutes(endStr);
+    const [startStr, endStr] = rangeLabel.split(" - ");
+    const startMin = timeToMinutes(startStr);
+    const endMin = timeToMinutes(endStr);
 
-  return timeMin >= startMin && timeMin <= endMin;
-}
+    return timeMin >= startMin && timeMin <= endMin;
+  }
+
+  const onPageChange = (e, page) => {
+    setCurrentPage(page);
+
+    //set ให้ล้างตัวที่เลือกหากกดเลือกหน้าต่อไป
+    // const startIndex = (page - 1) * pageSize;
+    // const endIndex = startIndex + pageSize - 1;
+    // if (
+    //   selectedRowGlobalIndex === null ||
+    //   selectedRowGlobalIndex < startIndex ||
+    //   selectedRowGlobalIndex > endIndex
+    // ) {
+    //   setSelectedRowGlobalIndex(null);
+    // }
+  };
 
   return (
     <div className="px-4 py-2 ">
-      <div className="md:w-auto flex-col md:flex-row space-y-2 md:space-y-0 z-100 ">
+      <div className="md:w-auto flex-col md:flex-row space-y-2 md:space-y-0 z-100  align-top">
         <Header
           onLogoClick={handleLogoClick}
           data={data}
@@ -263,7 +278,7 @@ function isTimeInRange(timeStr, rangeLabel) {
             setPageSize(parseInt(e.target.value));
             setCurrentPage(1);
           }}
-          className="border rounded px-2 py-1"
+          className="border rounded px-2 py-1 bg-black text-white border-white"
         >
           <option value={20}>20</option>
           <option value={50}>50</option>
@@ -279,7 +294,10 @@ function isTimeInRange(timeStr, rangeLabel) {
               <div className="relative inline-flex px-4" ref={dropdownRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle w-max px-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
+                  className="hs-dropdown-toggle w-max px-2 
+                  inline-flex items-center gap-x-2 text-sm 
+                  font-medium rounded-lg border border-gray-200
+                   bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
                   aria-haspopup="menu"
                   aria-expanded={open ? "true" : "false"}
                   aria-label="Dropdown"
@@ -306,7 +324,10 @@ function isTimeInRange(timeStr, rangeLabel) {
 
                 {open && (
                   <div
-                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute right-0 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md dark:bg-neutral-800 dark:border dark:border-neutral-700 max-h-60 overflow-auto"
+                    className="hs-dropdown-menu transition-[opacity,margin] 
+                    duration absolute right-0 z-10 mt-2 ml-5 min-w-fit origin-top-right 
+                    rounded-md bg-white shadow-md dark:bg-neutral-800 
+                    dark:border dark:border-neutral-700 max-h-60 overflow-auto"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
@@ -349,7 +370,10 @@ function isTimeInRange(timeStr, rangeLabel) {
               <div className="relative inline-flex" ref={plantDropdownRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-2 inline-flex items-center text-sm font-medium w-[200] rounded-lg border border-gray-200 bg-black text-neutral-100 shadow-2xs focus:outline-hidden "
+                  className="hs-dropdown-toggle py-2 px-2 inline-flex
+                   items-center text-sm font-medium w-[200] rounded-lg border
+                    border-gray-200 bg-black text-neutral-100 shadow-2xs 
+                    focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={plantDropdownOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -542,184 +566,197 @@ function isTimeInRange(timeStr, rangeLabel) {
           </tr>
         </thead>
         <tbody>
-          {paginatedData.map((row, index) => (
-            <tr
-              key={index}
-              className={`cursor-pointer hover:bg-blue-500 ${
-                selectedRowIndex === index
-                  ? "bg-purple-700 text-white"
-                  : row.Caution === 1
-                  ? "bg-caution-1-gradient text-white hover:bg-caution-blue-gradient"
-                  : row.Caution === 0.5
-                  ? "bg-caution-0.5-gradient text-black hover:bg-caution-blue-gradient"
-                  : "bg-white text-black"
-              }`}
-              onClick={() => setSelectedRowIndex(index)}
-            >
-              <td className="px-4 py-2 border">{row.TIME}</td>
-              <td className="px-4 py-2 border flex items-center relative">
-                <UserCircleIcon
-                  className="w-6 h-5 mr-2 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    const plant = row.PLANT;
-                    const tooltip = roleMap[plant];
-                    const htmlContent = (
-                      <div className="mt-2">
-                        <p className="flex items-center gap-2 ">
-                          <UserIcon className="w-5 h-5 inline-block" />
-                          <strong>Machine Diagnostic Engineer</strong> :
-                        </p>
-                        <p className="inline-flex items-center rounded-md bg-blue-800 px-2 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 ring-inset my-2 mx-8">
-                          {" "}
-                          {tooltip.engineer}
-                        </p>
-                        <br />
-                        <p className="flex items-center gap-2 ">
-                          <UserIcon className="w-5 h-5 inline-block" />
-                          <strong>Machine Monitoring Officer</strong> :
-                        </p>
-                        <p className="inline-flex items-center rounded-md bg-blue-700 px-2 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 ring-inset my-2 mx-8">
-                          {tooltip.officer}
-                        </p>
-                      </div>
-                    );
-                    const htmlString =
-                      ReactDOMServer.renderToStaticMarkup(htmlContent);
+          {paginatedData.map((row, index) => {
+            const globalIndex = (currentPage - 1) * pageSize + index;
+            const isSelected = selectedRowGlobalIndex === globalIndex;
+            return (
+              <tr
+                key={globalIndex}
+                className={`cursor-pointer hover:bg-blue-500 ${
+                  isSelected
+                    ? "bg-purple-700 text-white"
+                    : row.Caution === 1
+                    ? "bg-caution-1-gradient text-white hover:bg-caution-blue-gradient"
+                    : row.Caution === 0.5
+                    ? "bg-caution-0.5-gradient text-black hover:bg-caution-blue-gradient"
+                    : "bg-white text-black"
+                }`}
+                onClick={() => setSelectedRowGlobalIndex(globalIndex)}
+              >
+                <td className="px-4 py-2 border">{row.TIME}</td>
+                <td className="px-4 py-2 border flex items-center relative">
+                  <UserCircleIcon
+                    className="w-6 h-5 mr-2 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const plant = row.PLANT;
+                      const tooltip = roleMap[plant];
+                      const htmlContent = (
+                        <div className="mt-4">
+                          <p className="flex items-center gap-2 ">
+                            <UserIcon className="w-5 h-5 inline-block " />
+                            <strong>Machine Diagnostic Engineer</strong> :
+                          </p>
+                          <p className="inline-flex items-center rounded-md bg-blue-800 
+                          px-4 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 
+                          ring-inset my-2 mx-8">
+                            {" "}
+                            {tooltip.engineer}
+                          </p>
+                          <br />
+                          <p className="flex items-center gap-2 mt-2">
+                            <UserIcon className="w-5 h-5 inline-block" />
+                            <strong>Machine Monitoring Officer</strong> :
+                          </p>
+                          <p className="inline-flex items-center rounded-md bg-blue-600 px-4 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 ring-inset my-2 mx-8">
+                            {tooltip.officer}
+                          </p>
+                        </div>
+                      );
+                      const htmlString =
+                        ReactDOMServer.renderToStaticMarkup(htmlContent);
 
-                    Swal.fire({
-                      position: "top-end",
-                      icon: undefined,
-                      title: iconHtml + "Coordinator",
-                      html: htmlString,
-                      toast: true,
-                      showCloseButton: true,
-                      showConfirmButton: false,
-                      background:
-                        "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287)",
-                      color: "#ffffff",
-                      timer: null,
-                      customClass: {
-                        popup: "shadow-md text-sm text-start",
-                        closeButton:
-                          "absolute top-2 right-2 text-white text-lg",
-                      },
-                      showClass: {
-                        popup:
-                          "animate__animated animate__fadeInRight animate__faster",
-                      },
-                      hideClass: {
-                        popup:
-                          "animate__animated animate__fadeOutRight animate__faster",
-                      },
-                      willClose: () => {
-                        document.body.style.overflow = "";
-                      },
-                    });
-                  }}
-                />
-                {row.PLANT || "-"}
-              </td>
-              <td className="px-4 py-2 border">{row.MACHINE}</td>
-              <td className="px-2 py-2 border">{row.COMPONENT}</td>
-              <td className="px-5 py-2 border text-start whitespace-normal">
-                <span className="inline-flex items-center space-x-2 max-w-full">
-                  <span className="text-sm truncate">{row.MODEL}</span>
+                      Swal.fire({
+                        position: "top-end",
+                        icon: undefined,
+                        title: iconHtml + "Coordinator",
+                        html: htmlString,
+                        toast: true,
+                        showCloseButton: true,
+                        showConfirmButton: false,
+                        background:
+                          "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287)",
+                        color: "#ffffff",
+                        // timer: null,
+                        timer: 3000,
+                        customClass: {
+                          popup: "shadow-md text-sm text-start",
+                          closeButton:
+                            "absolute top-2 right-2 text-white text-lg",
+                        },
+                        showClass: {
+                          popup:
+                            "animate__animated animate__fadeInRight animate__faster",
+                        },
+                        hideClass: {
+                          popup:
+                            "animate__animated animate__fadeOutRight animate__faster",
+                        },
+                        willClose: () => {
+                          document.body.style.overflow = "";
+                        },
+                      });
+                    }}
+                  />
+                  {row.PLANT || "-"}
+                </td>
+                <td className="px-4 py-2 border">{row.MACHINE}</td>
+                <td className="px-2 py-2 border">{row.COMPONENT}</td>
+                <td className="px-2 py-2 border text-start whitespace-normal">
+                  <span className="inline-flex items-center space-x-2 max-w-full">
+                    <span className="text-sm truncate">{row.MODEL}</span>
 
-                  {typeof row.Note === "string" &&
-                    row.Note.trim() !== "" &&
-                    row.Note.trim().toLowerCase() !== "null" &&
-                    row.Note.trim().toLowerCase() !== "undefined" && (
-                      <Badge color="secondary" badgeContent={0}>
-                        <MailIcon
-                          className="w-4 h-4 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const acknowledge = row.Acknowledge || "N/A";
-                            const noteText = row.Note || "No note";
-                            const htmlContent = (
-                              <div className="mt-2 w-max">
-                                <p className="flex items-center gap-2 break-words whitespace-pre-wrap ">
-                                  <CalendarIcon className="w-5 h-5 inline-block" />
-                                  <strong>
-                                    Acknowledge Time :
-                                    <span
-                                      className="inline-flex items-center rounded-md 
-                                     bg-blue-700 px-2 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 ring-inset my-2"
-                                    >
-                                      {acknowledge}
+                    {typeof row.Note === "string" &&
+                      row.Note.trim() !== "" &&
+                      row.Note.trim().toLowerCase() !== "null" &&
+                      row.Note.trim().toLowerCase() !== "undefined" && (
+                        <Badge color="secondary" badgeContent={0}>
+                          <MailIcon
+                            className="w-4 h-4 cursor-pointer "
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const acknowledge = row.Acknowledge || "N/A";
+                              const noteText = row.Note || "No note";
+                              const htmlContent = (
+                                <div className="mt-2 w-max">
+                                  <p className="flex items-center gap-2 break-words whitespace-pre-wrap ">
+                                    <CalendarIcon className="w-6 h-6 inline-block" />
+                                    <strong>
+                                      Acknowledge Time :
+                                      <span
+                                        className="inline-flex items-center rounded-md 
+                                     bg-blue-700 px-2 py-1 text-xs font-medium text-white ring-1
+                                      ring-gray-500/10 ring-inset my-2 mx-2"
+                                      >
+                                        {acknowledge}
+                                      </span>
+                                    </strong>
+                                  </p>
+
+                                  <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1">
+                                    <ChatBubbleLeftEllipsisIcon className="w-6 h-6 inline-block" />
+                                    <strong> Note: </strong>
+                                    <span className="inline-flex items-center rounded-md
+                                     bg-green-600 px-2 py-1 text-xs font-medium text-white 
+                                     ring-1 ring-gray-500/10 ring-inset ml-1">
+                                      {noteText}
                                     </span>
-                                  </strong>
-                                </p>
+                                  </p>
+                                </div>
+                              );
+                              const htmlString =
+                                ReactDOMServer.renderToStaticMarkup(htmlContent);
 
-                                <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-2">
-                                  <strong>Note:</strong>
-                                  <span className="inline-flex items-center rounded-md bg-blue-700 px-2 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-2">
-                                    {noteText}
-                                  </span>
-                                </p>
-                              </div>
-                            );
-                            const htmlString =
-                              ReactDOMServer.renderToStaticMarkup(htmlContent);
-
-                            Swal.fire({
-                              position: "top-end",
-                              icon: undefined,
-                              title: "Time & Acknowledge",
-                              html: htmlString,
-                              toast: true,
-                              showCloseButton: true,
-                              showConfirmButton: false,
-                              background:
-                                "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287))",
-                              color: "#ffffff",
-                              timer: null,
-                              customClass: {
-                                popup: "relative shadow-md text-sm text-start",
-                                closeButton:
-                                  "absolute top-2 right-2 text-white text-lg",
-                              },
-                              showClass: {
-                                popup:
-                                  "animate__animated animate__fadeInRight animate__faster",
-                              },
-                              hideClass: {
-                                popup:
-                                  "animate__animated animate__fadeOutRight animate__faster",
-                              },
-                              willClose: () => {
-                                document.body.style.overflow = "";
-                              },
-                            });
-                          }}
-                        />
-                      </Badge>
-                    )}
-                </span>
-              </td>
-              <td className="px-4 py-2 border">{row.HEALTHSCORE}</td>
-              <td className="px-4 py-2 border">{row.Actual_Value}</td>
-              <td className="px-4 py-2 border">{row.UNITS}</td>
-            </tr>
-          ))}
+                              Swal.fire({
+                                position: "top-end",
+                                icon: undefined,
+                                title: "Time & Acknowledge",
+                                html: htmlString,
+                                toast: true,
+                                showCloseButton: true,
+                                showConfirmButton: false,
+                                background:
+                                  "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287))",
+                                color: "#ffffff",
+                                // timer: null,
+                                timer: 3000,
+                                customClass: {
+                                  popup: "relative shadow-md text-sm text-start",
+                                  closeButton:
+                                    "absolute top-2 right-2 text-white text-lg",
+                                },
+                                showClass: {
+                                  popup:
+                                    "animate__animated animate__fadeInRight animate__faster",
+                                },
+                                hideClass: {
+                                  popup:
+                                    "animate__animated animate__fadeOutRight animate__faster",
+                                },
+                                willClose: () => {
+                                  document.body.style.overflow = "";
+                                },
+                              });
+                            }}
+                          />
+                        </Badge>
+                      )}
+                  </span>
+                </td>
+                <td className="px-4 py-2 border">{row.HEALTHSCORE}</td>
+                <td className="px-4 py-2 border">{row.Actual_Value}</td>
+                <td className="px-4 py-2 border">{row.UNITS}</td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
 
-      {showModal && selectedRowIndex !== null && (
+      {showModal && selectedRowGlobalIndex !== null && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white text-black p-6 rounded-lg shadow-lg w-[90%] max-w-md">
-            <h3 className="text-lg font-semibold mb-4">Edit Row</h3>
+          <div
+            className={`bg-white text-black p-6 rounded-lg shadow-lg w-[90%] max-w-md
+          animate__animated animate__fadeInUp animate__faster  ${
+            isClosing ? "animate__fadeOut" : "animate__fadeInUp"
+          }
+            animate__faster`}
+          >
+            <h3 className="text-lg font-semibold mb-4">Edit Action Row</h3>
             <div className="mb-4">
-              <label className="block font-medium mb-1 text-start">
-                Select Action:
-              </label>
+              <label className="block font-medium mb-1 text-start">Select Action:</label>
 
               <div className="flex flex-col gap-2">
-                <label
-                  htmlFor="action-acknowledge"
-                  className="flex items-center gap-2 cursor-pointer"
-                >
+                <label htmlFor="action-acknowledge" className="flex items-center gap-2 cursor-pointer">
                   <input
                     id="action-acknowledge"
                     type="radio"
@@ -731,10 +768,7 @@ function isTimeInRange(timeStr, rangeLabel) {
                   />
                   Acknowledge
                 </label>
-                <label
-                  htmlFor="action-followup"
-                  className="flex items-center gap-2 cursor-pointer"
-                >
+                <label htmlFor="action-followup" className="flex items-center gap-2 cursor-pointer">
                   <input
                     id="action-followup"
                     type="radio"
@@ -746,10 +780,7 @@ function isTimeInRange(timeStr, rangeLabel) {
                   />
                   Follow-up
                 </label>
-                <label
-                  htmlFor="action-custom"
-                  className="flex items-center gap-2 cursor-pointer"
-                >
+                <label htmlFor="action-custom" className="flex items-center gap-2 cursor-pointer">
                   <input
                     id="action-custom"
                     type="radio"
@@ -766,9 +797,7 @@ function isTimeInRange(timeStr, rangeLabel) {
 
             {action === "custom" && (
               <div className="mb-4">
-                <label className="block font-medium mb-1 text-start">
-                  Enter Custom Caution Value:
-                </label>
+                <label className="block font-medium mb-1 text-start">Enter Custom Caution Value:</label>
                 <textarea
                   className="w-full border border-gray-300 bg-white rounded px-3 py-2 text-black"
                   value={customCaution}
@@ -790,8 +819,8 @@ function isTimeInRange(timeStr, rangeLabel) {
 
             <div className="flex justify-end gap-3">
               <button
-                onClick={() => setShowModal(false)}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                onClick={closeModalWithFade}
+                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 "
               >
                 Cancel
               </button>
@@ -811,7 +840,7 @@ function isTimeInRange(timeStr, rangeLabel) {
           <Pagination
             count={Math.ceil(filteredData.length / pageSize)}
             page={currentPage}
-            onChange={(e, page) => setCurrentPage(page)}
+            onChange={(e, page) => onPageChange(e, page)}
             variant="outlined"
             shape="rounded"
             className="bg-transparent"
