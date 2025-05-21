@@ -72,7 +72,7 @@ function Table() {
   const dropdownRef = useRef(null);
   const [plantDropdownOpen, setPlantDropdownOpen] = useState(false);
 
-  const [selectedPlant, setSelectedPlant] = useState("Select All Plants");
+  const [selectedPlant, setSelectedPlant] = useState("All Plants");
   const plantDropdownRef = useRef(null);
 
   const [machineOpen, setmachineopen] = useState(false);
@@ -100,7 +100,7 @@ function Table() {
 
   //load data
    useEffect(() => {
-    if (selectedPlant && selectedPlant !== "Select All Plants") {
+    if (selectedPlant && selectedPlant !== "All Plants") {
       const machines = Array.from(
         new Set(
           data
@@ -123,7 +123,7 @@ function Table() {
   useEffect(() => {
     if (
       selectedPlant &&
-      selectedPlant !== "Select All Plants" &&
+      selectedPlant !== "All Plants" &&
       selectedmachine &&
       selectedmachine !== "Select All Machine"
     ) {
@@ -167,14 +167,12 @@ function Table() {
 
   useMultipleOutsideClick(dropdowns);
 
-  const timeRanges = [
-    "00:00 - 03:59",
-    "04:00 - 07:59",
-    "08:00 - 11:59",
-    "12:00 - 15:59",
-    "16:00 - 19:59",
-    "20:00 - 23:59",
-  ];
+const timeRanges = [
+  "00:00 - 05:59",
+  "06:00 - 11:59",
+  "12:00 - 17:59",
+  "18:00 - 23:59",
+];
 
   const handleSelectTime = (timeRange) => {
     setSelectedTime(timeRange);
@@ -212,7 +210,7 @@ function Table() {
   // กรองข้อมูล
   const filteredData = data.filter((row) => {
     const matchTime = isTimeInRange(row.TIME, selectedTime);
-    const matchPlant = selectedPlant === "Select All Plants" || row.PLANT === selectedPlant;
+    const matchPlant = selectedPlant === "All Plants" || row.PLANT === selectedPlant;
     const matchComponent = selectedcomponents === "Select All Components" || row.COMPONENT === selectedcomponents;
     const matchMachine = selectedmachine === "Select All Machine" || row.MACHINE === selectedmachine;
     const lowerSearch = searchTerm.toLowerCase();
@@ -311,7 +309,7 @@ function Table() {
   };
 
   return (
-  <div className="p-5 flex flex-col " style={{ width: "100%" }}>
+  <div className="p-10 flex flex-col mx-auto overflow-x-hidden" style={{ width: "100vw", maxWidth: "100%" }}>
       <div
         className="md:w-auto flex-col md:flex-row space-y-2 
       md:space-y-0 z-100 align-top"
@@ -325,21 +323,18 @@ function Table() {
         />
       </div>
 
-      <table
-        className="font-custom table-auto border-collapse border text-sm border-gray-300 
-        mt-5  px-5" 
-      >
+     <table className="font-custom table-auto border-collapse border text-sm mt-10 w-full">
         
-        <thead className="bg-headtable-gradient text-sm text-teal-50 ">
+        <thead className="bg-headtable-gradient text-lg text-sky-500 ">
           <tr>
             <th className="border border-black text-sm">
               {/* Time dropdown */}
-              <div className="relative inline-flex px-4" ref={dropdownRef}>
+              <div className="relative inline-flex" ref={dropdownRef}>
                 <button
                   type="button"
                   className="hs-dropdown-toggle w-max px-2 
                   inline-flex items-center gap-x-2 text-sm 
-                  font-medium rounded-lg border border-gray-200
+                  font-medium rounded-lg border border-sky-500
                    bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
                   aria-haspopup="menu"
                   aria-expanded={open ? "true" : "false"}
@@ -409,11 +404,13 @@ function Table() {
             </th>
 
               {/* Plant dropdown */}
-            <th className="px-2 py-2 border border-black">
+            <th className=" py-2 border border-black">
               <div className="relative inline-flex" ref={plantDropdownRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-2 inline-flex items-center text-sm font-medium w-[200] rounded-lg border border-gray-200 bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
+                  className="hs-dropdown-toggle py-2 px-2 inline-flex 
+                  items-center text-sm font-medium w-[200] rounded-lg 
+                  border border-sky-500 bg-black text-neutral-100 shadow-white focus:outline-hidden"
                   aria-haspopup="menu"
                   aria-expanded={plantDropdownOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -438,7 +435,10 @@ function Table() {
 
                 {plantDropdownOpen && (
                   <div
-                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute right-0 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md dark:bg-neutral-800 dark:border dark:border-neutral-700 max-h-60 overflow-auto"
+                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
+                    right-0 z-10 mt-2 min-w-fit origin-top-right rounded-md
+                     bg-white shadow-md dark:bg-neutral-800 dark:border
+                      dark:border-neutral-700 max-h-60 overflow-auto"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
@@ -446,10 +446,10 @@ function Table() {
                     <div className="p-1 space-y-1">
                       <button
                         key="all-plants"
-                        onClick={() => handleSelectPlant("Select All Plants")}
+                        onClick={() => handleSelectPlant("All Plants")}
                         className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
                       >
-                        Select All Plants
+                        All Plants
                       </button>
                       {plantOptions.map((plant) => (
                         <button
@@ -467,11 +467,13 @@ function Table() {
             </th>
 
             {/* Machine dropdown */}
-            <th className="px-5 py-2 border border-black">
+            <th className=" py-2 border border-black">
               <div className="relative inline-flex" ref={machineRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-black text-neutral-100 shadow-2xs focus:outline-hidden "
+                  className="hs-dropdown-toggle py-2 px-2 inline-flex 
+                  items-center gap-x-2 text-sm font-medium rounded-lg border
+                   border-sky-500 bg-black text-neutral-100 shadow-2xs focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={machineOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -530,11 +532,12 @@ function Table() {
             </th>
 
             {/* Components dropdown */}
-            <th className="px-4 py-2 border border-black">
+            <th className=" py-2 border border-black">
               <div className="relative inline-flex" ref={componentsRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-black text-neutral-100 shadow-2xs  focus:outline-hidden"
+                  className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-sm 
+                  font-medium rounded-lg border border-sky-500 bg-black text-neutral-100 shadow-2xs  focus:outline-hidden"
                   aria-haspopup="menu"
                   aria-expanded={componentsOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -594,10 +597,10 @@ function Table() {
               </div>
             </th>
 
-            <th className="px-4 py-2 border border-black">Model</th>
-            <th className="px-4 py-2 border border-black">Healthscore</th>
-            <th className="px-4 py-2 border border-black">Actual value</th>
-            <th className="px-4 py-2 border border-black">Units</th>
+            <th className="py-2 border border-black">Model</th>
+            <th className="py-2 border border-black">Healthscore</th>
+            <th className="py-2 border border-black">Actual value</th>
+            <th className="py-2 border border-black">Units</th>
           </tr>
         </thead>
         <tbody>
@@ -619,9 +622,10 @@ function Table() {
                 onClick={() => setSelectedRowGlobalIndex(globalIndex)}
               >
                 {/* time row detail */}
-                <td className="px-4 py-2 border">{row.TIME}</td>
+                <td className="py-2 border">{row.TIME}</td>
+                
                  {/* plant row detail */}
-                <td className="px-2 py-2 border flex items-center">
+                <td className="py-2 border flex items-center">
                   <UserCircleIcon
                     className="w-6 h-5 mr-2 cursor-pointer"
                     onClick={(e) => {
@@ -690,12 +694,12 @@ function Table() {
                   {row.PLANT || "-"}
                 </td>
 
-                <td className="px-4 py-2 border">{row.MACHINE}</td>
-                <td className="px-2 py-2 border">{row.COMPONENT}</td>
+                <td className="py-2 border">{row.MACHINE}</td>
+                <td className="py-2 border">{row.COMPONENT}</td>
 
-                <td className="px-2 py-2 border text-start whitespace-normal">
-                  <span className="inline-flex items-center space-x-2 max-w-full">
-                    <span className="text-sm truncate">{row.MODEL}</span>
+                <td className=" border text-center whitespace-normal">
+                  <span className="flex items-center space-x-2 w-auto">
+                    <span className="text-sm truncate ">{row.MODEL}</span>
 
                     {typeof row.Note === "string" &&
                       row.Note.trim() !== "" &&
@@ -703,7 +707,7 @@ function Table() {
                       row.Note.trim().toLowerCase() !== "undefined" && (
                         <Badge color="secondary" badgeContent={0}>
                           <MailIcon
-                            className="w-4 h-4 cursor-pointer "
+                            className="w-4 h-4 cursor-pointer text-rose-600"
                             onClick={(e) => {
                               e.stopPropagation();
                               const acknowledge = row.Acknowledge || "N/A";
@@ -779,9 +783,10 @@ function Table() {
                       )}
                   </span>
                 </td>
-                <td className="px-4 py-2 border">{row.HEALTHSCORE}</td>
-                <td className="px-4 py-2 border">{row.Actual_Value}</td>
-                <td className="px-4 py-2 border">{row.UNITS}</td>
+                
+                <td className="py-2 border">{row.HEALTHSCORE}</td>
+                <td className="py-2 border">{row.Actual_Value}</td>
+                <td className="py-2 border">{row.UNITS}</td>
               </tr>
             );
           })}
@@ -900,21 +905,8 @@ function Table() {
             count={Math.ceil(filteredData.length / pageSize)}
             page={currentPage}
             onChange={(e, page) => onPageChange(e, page)}
-            variant="outlined"
-            shape="rounded"
-            className="bg-transparent"
-            sx={{
-              "& .MuiPaginationItem-root": {
-                color: "#0ea5e9",
-              },
-              "& .MuiPaginationItem-root.Mui-selected": {
-                backgroundColor: "#0ea5e9",
-                color: "#ffffff",
-              },
-              "& .MuiPaginationItem-root:hover": {
-                backgroundColor: "#bae6fd",
-              },
-            }}
+            color="primary"
+            
           />
         </Stack>
       </div>

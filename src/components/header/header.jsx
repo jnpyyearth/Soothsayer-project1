@@ -2,8 +2,6 @@ import logoImage from '../../assets/Thesoothsayer.png'; // นำเข้าโ
 import SearchBar from '../search/search';
 
 function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
-  // ย้าย state searchTerm มาไว้ใน Header
-  
   // สร้าง autocomplete suggestions จาก data
   const allKeywords = [
     ...new Set([
@@ -27,10 +25,10 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
   <div className="px-6 py-4">
 
     {/* logo อยู่บรรทัดแรก */}
-     <div className="flex justify-center items-center h-24">
+     <div className="flex justify-center items-center h-12">
       <img
         src={logoImage}
-        className="ml-20 py-6 cursor-pointer "
+        className="ml-20 py-6 cursor-pointer w-80 h-auto"
         id="logolink"
         alt="logosoothsayer"
         onClick={onLogoClick}

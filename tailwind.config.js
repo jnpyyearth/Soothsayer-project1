@@ -17,10 +17,9 @@ export default {
         "headtable-gradient":
           "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287))",
         "caution-1-gradient":
-          "linear-gradient(to top,oklch(45.5% 0.188 13.697),oklch(51.4% 0.222 16.935),oklch(58.6% 0.253 17.585))",
-        // 'caution-1-gradient': 'linear-gradient(to top, oklch(39.6% 0.141 25.723), oklch(50.5% 0.213 27.518), oklch(63.7% 0.237 25.331))',
+          "linear-gradient(to top,oklch(50.5% 0.213 27.518),oklch(51.4% 0.222 16.935),oklch(58.6% 0.253 17.585))",
         "caution-0.5-gradient":
-          "linear-gradient(to top ,oklch(79.5% 0.184 86.047),oklch(85.2% 0.199 91.936),oklch(94.5% 0.129 101.54))",
+          "linear-gradient(to bottom ,oklch(85.2% 0.199 91.936),oklch(90.5% 0.182 98.111))",
         "caution-blue-gradient": "linear-gradient(to top, #3b82f6, #60a5fa)",
       },
       textColor: {
