@@ -38,7 +38,7 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
     </div>
 
     {/* searchbar อยู่บรรทัดถัดมา */}
-    <div className="relative w-[400px]">
+    <div className="relative w-[400px] mt-10">
       <SearchBar
         className="w-full"
         searchTerm={searchTerm}

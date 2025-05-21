@@ -3,7 +3,6 @@ import { UserCircleIcon } from "@heroicons/react/24/solid";
 import { UserGroupIcon, CalendarIcon, UserIcon ,ChatBubbleLeftEllipsisIcon  } from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
-import SearchBar from "../search/search";
 import Badge from "@mui/material/Badge";
 import MailIcon from "@mui/icons-material/Mail";
 import Pagination from "@mui/material/Pagination";
@@ -69,17 +68,82 @@ function Table() {
 
   const [open, setOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState("Select All Time");
+
   const dropdownRef = useRef(null);
   const [plantDropdownOpen, setPlantDropdownOpen] = useState(false);
+
   const [selectedPlant, setSelectedPlant] = useState("Select All Plants");
   const plantDropdownRef = useRef(null);
+
   const [machineOpen, setmachineopen] = useState(false);
   const [selectedmachine, setSelectedmachine] = useState("Select All Machine");
   const machineRef = useRef(null);
+
   const [componentsOpen, setComponentopen] = useState(false);
   const [selectedcomponents, setSelectedcomponents] = useState("Select All Components");
   const componentsRef = useRef(null);
+  
+  // option dropdown plant-machine-components
+  const [plantOptions, setPlantoptions] = useState();
+  const [machineOption , setMachineoptions] = useState();
+  const [componentsOption , setComponentsoptions] = useState();
 
+ // Load plants from data
+  useEffect(() => {
+    if (data.length > 0) {
+      const plants = Array.from(new Set(data.map(row => row.PLANT))).filter(Boolean);
+      setPlantoptions(plants);
+    } else {
+      setPlantoptions([]);
+    }
+  }, [data]);
+
+  //load data
+   useEffect(() => {
+    if (selectedPlant && selectedPlant !== "Select All Plants") {
+      const machines = Array.from(
+        new Set(
+          data
+            .filter(row => row.PLANT === selectedPlant)
+            .map(row => row.MACHINE)
+        )
+      ).filter(Boolean);
+      setMachineoptions(machines);
+    } else {
+      setMachineoptions([]);
+    }
+    // Reset machine and component selection on plant change
+    setSelectedmachine("Select All Machine");
+    setComponentsoptions([]);
+    setSelectedcomponents("Select All Components");
+  }, [selectedPlant, data]);
+
+
+   // Update components เมื่อเลือก machine หรือ Plant 
+  useEffect(() => {
+    if (
+      selectedPlant &&
+      selectedPlant !== "Select All Plants" &&
+      selectedmachine &&
+      selectedmachine !== "Select All Machine"
+    ) {
+      const components = Array.from(
+        new Set(
+          data
+            .filter(row => row.PLANT === selectedPlant && row.MACHINE === selectedmachine)
+            .map(row => row.COMPONENT)
+        )
+      ).filter(Boolean);
+      setComponentsoptions(components);
+    } else {
+      setComponentsoptions([]);
+    }
+    // Reset component selection on machine change
+    setSelectedcomponents("Select All Components");
+  }, [selectedmachine, selectedPlant, data]);
+
+
+  //fetch api
   const fetchData = () => {
     fetch("/get_data")
       .then((res) => res.json())
@@ -90,6 +154,7 @@ function Table() {
     fetchData();
   }, []);
 
+  // set dropdown
   const dropdowns = useMemo(
     () => ({
       timeDropdown: { ref: dropdownRef, isOpen: open, setOpen },
@@ -161,7 +226,6 @@ function Table() {
 
   const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const uniquePlants = Array.from(new Set(data.map((row) => row.PLANT))).filter(Boolean);
 
   const handleLogoClick = () => {
     if (selectedRowGlobalIndex !== null) {
@@ -247,10 +311,10 @@ function Table() {
   };
 
   return (
-    <div className={{overflowX: "visible", width: "100%", overflowY: "visible", height: "100%" }}>
+  <div className="p-5 flex flex-col " style={{ width: "100%" }}>
       <div
         className="md:w-auto flex-col md:flex-row space-y-2 
-      md:space-y-0 z-100  align-top"
+      md:space-y-0 z-100 align-top"
       >
         <Header
           onLogoClick={handleLogoClick}
@@ -263,7 +327,7 @@ function Table() {
 
       <table
         className="font-custom table-auto border-collapse border text-sm border-gray-300 
-        mt-4 w-full"style={{ tableLayout: "auto" }}
+        mt-5  px-5" 
       >
         
         <thead className="bg-headtable-gradient text-sm text-teal-50 ">
@@ -344,15 +408,12 @@ function Table() {
               </div>
             </th>
 
-            {/* Plant dropdown */}
-            <th className="px-4 py-2 border border-black">
+              {/* Plant dropdown */}
+            <th className="px-2 py-2 border border-black">
               <div className="relative inline-flex" ref={plantDropdownRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-2 inline-flex
-                   items-center text-sm font-medium w-[200] rounded-lg border
-                    border-gray-200 bg-black text-neutral-100 shadow-2xs 
-                    focus:outline-hidden "
+                  className="hs-dropdown-toggle py-2 px-2 inline-flex items-center text-sm font-medium w-[200] rounded-lg border border-gray-200 bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
                   aria-haspopup="menu"
                   aria-expanded={plantDropdownOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -360,9 +421,7 @@ function Table() {
                 >
                   {selectedPlant}
                   <svg
-                    className={`size-4 transition-transform ${
-                      plantDropdownOpen ? "rotate-180" : ""
-                    }`}
+                    className={`size-4 transition-transform ${plantDropdownOpen ? "rotate-180" : ""}`}
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
                     height="24"
@@ -392,11 +451,11 @@ function Table() {
                       >
                         Select All Plants
                       </button>
-                      {uniquePlants.map((plant) => (
+                      {plantOptions.map((plant) => (
                         <button
                           key={plant}
                           onClick={() => handleSelectPlant(plant)}
-                          className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap dark:text-neutral-400 dark:hover:bg-neutral-700 "
+                          className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap dark:text-neutral-400 dark:hover:bg-neutral-700"
                         >
                           {plant}
                         </button>
@@ -454,17 +513,16 @@ function Table() {
                       >
                         Select All Machine
                       </button>
-                      {[...new Set(data.map((row) => row.MACHINE))].map(
-                        (machine) => (
-                          <button
-                            key={machine}
-                            onClick={() => handleSelectmachine(machine)}
-                            className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
-                          >
-                            {machine}
-                          </button>
-                        )
-                      )}
+
+                   {machineOption.map((machine) => (
+                        <button
+                          key={machine}
+                          onClick={() => handleSelectmachine(machine)}
+                          className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                        >
+                          {machine}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -520,17 +578,15 @@ function Table() {
                           Select All Components
                         </button>
 
-                        {[...new Set(data.map((row) => row.COMPONENT))].map(
-                          (component) => (
-                            <button
-                              key={component}
-                              onClick={() => handleSelectcomponent(component)}
-                              className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
-                            >
-                              {component}
-                            </button>
-                          )
-                        )}
+                       {componentsOption.map((component) => (
+                          <button
+                            key={component}
+                            onClick={() => handleSelectcomponent(component)}
+                            className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                          >
+                            {component}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -562,8 +618,10 @@ function Table() {
                 }`}
                 onClick={() => setSelectedRowGlobalIndex(globalIndex)}
               >
+                {/* time row detail */}
                 <td className="px-4 py-2 border">{row.TIME}</td>
-                <td className="px-4 py-2 border flex items-center relative">
+                 {/* plant row detail */}
+                <td className="px-2 py-2 border flex items-center">
                   <UserCircleIcon
                     className="w-6 h-5 mr-2 cursor-pointer"
                     onClick={(e) => {
@@ -631,8 +689,10 @@ function Table() {
                   />
                   {row.PLANT || "-"}
                 </td>
+
                 <td className="px-4 py-2 border">{row.MACHINE}</td>
                 <td className="px-2 py-2 border">{row.COMPONENT}</td>
+
                 <td className="px-2 py-2 border text-start whitespace-normal">
                   <span className="inline-flex items-center space-x-2 max-w-full">
                     <span className="text-sm truncate">{row.MODEL}</span>
