@@ -5,7 +5,7 @@ import Table from './components/table/table';
 
    function App() {
   return (
-    <div className="w-screen overflow-hidden ">
+    <div className=" overflow-hidden ">
       <div className=" mt-5 ">
         <Table />
       </div>

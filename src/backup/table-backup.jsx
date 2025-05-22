@@ -45,6 +45,8 @@ function Table() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isClosing, setIsClosing] = useState(false);
+  const [selectedDate,setSelectedDate] = useState("");
+  
   const pageSize = 25; 
 
   const closeModalWithFade = () => {
@@ -209,17 +211,31 @@ const timeRanges = [
 
   // กรองข้อมูล
   const filteredData = data.filter((row) => {
+    // แปลง row.TIME จาก "28/4/2025 1:00" ให้เป็น "2025-04-28"
     const matchTime = isTimeInRange(row.TIME, selectedTime);
+     let rowDateOnly = "";
+     if (row.TIME) {
+       const [datePart] = row.TIME.split(" ");
+       const [day, month, year] = datePart.split("/");
+       if (day && month && year) {
+         // แปลงให้อยู่ในรูปแบบ yyyy-mm-dd 
+         const yyyy = year.padStart(4, "0");
+         const mm = month.padStart(2, "0");
+         const dd = day.padStart(2, "0");
+         rowDateOnly = `${yyyy}-${mm}-${dd}`;
+       }
+     }
     const matchPlant = selectedPlant === "All Plants" || row.PLANT === selectedPlant;
     const matchComponent = selectedcomponents === "Select All Components" || row.COMPONENT === selectedcomponents;
     const matchMachine = selectedmachine === "Select All Machine" || row.MACHINE === selectedmachine;
+    const matchDate = selectedDate === "" || rowDateOnly === selectedDate;
     const lowerSearch = searchTerm.toLowerCase();
     const matchSearch =
       !searchTerm ||
       row.MODEL.toLowerCase().includes(lowerSearch) ||
       row.COMPONENT.toLowerCase().includes(lowerSearch) ||
       row.UNITS.toLowerCase().includes(lowerSearch);
-    return matchTime && matchPlant && matchComponent && matchMachine && matchSearch;
+    return matchDate && matchTime && matchPlant && matchComponent && matchMachine && matchSearch;
   });
 
   const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -331,61 +347,59 @@ const timeRanges = [
           <tr>
             <th className="border border-black text-sm w-[10%]">
               {/* Time dropdown */}
-              <div className="relative inline-flex" ref={dropdownRef}>
-                <button
-                  type="button"
-                  className="hs-dropdown-toggle w-max px-2 py-2
-                  inline-flex items-center gap-x-2 text-base 
-                  font-medium rounded-lg border border-sky-500
-                   bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
-                  aria-haspopup="menu"
-                  aria-expanded={open ? "true" : "false"}
-                  aria-label="Dropdown"
-                  onClick={() => setOpen(!open)}
-                >
-                  {selectedTime}
-                  <svg
-                    className={`size-4 transition-transform ${
-                      open ? "rotate-180" : ""
-                    }`}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+              <div className="inline-flex space-x-2 items-center">
+                {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
+                <div className="relative inline-flex" ref={dropdownRef}>
+                  <button
+                    type="button"
+                    className="hs-dropdown-toggle w-max px-3 py-2
+      inline-flex items-center gap-x-2 text-base 
+      font-medium rounded-lg border border-sky-500
+      bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
+                    aria-haspopup="menu"
+                    aria-expanded={open ? "true" : "false"}
+                    aria-label="Dropdown"
+                    onClick={() => setOpen(!open)}
                   >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
+                    {selectedTime}
+                    <svg
+                      className={`size-4 transition-transform ${
+                        open ? "rotate-180" : ""
+                      }`}
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
 
-                {open && (
-                  <div
-                    className="hs-dropdown-menu transition-[opacity,margin] 
-                    duration absolute right-0 z-10 mt-2 ml-5 min-w-fit origin-top-right 
-                    rounded-md bg-white shadow-md dark:bg-neutral-800 
-                    dark:border dark:border-neutral-700 max-h-60 overflow-visible"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="hs-dropdown-hover-event"
-                  >
-                    <div className="p-5 overflow-x-auto">
-                      <div className="min-w-max space-y-1">
-                        {/* ปุ่มเลือกช่วงเวลาใหญ่ทั้งหมด */}
+                  {open && (
+                    <div
+                      className="hs-dropdown-menu transition-[opacity,margin] duration absolute right-0 z-10 mt-2
+        rounded-md bg-white shadow-md dark:bg-neutral-800
+        dark:border dark:border-neutral-700 max-h-60 overflow-auto min-w-[180px]"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="hs-dropdown-hover-event"
+                    >
+                      <div className="p-3">
                         <button
                           onClick={() => {
                             handleSelectTime("Select All Time");
                             setOpen(false);
                           }}
-                          className="block text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                          className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
                         >
                           Select All Time
                         </button>
 
-                        {/* แสดงเฉพาะช่วงเวลาใหญ่ (range) */}
                         {timeRanges.map((rangeLabel) => (
                           <button
                             key={rangeLabel}
@@ -393,22 +407,33 @@ const timeRanges = [
                               handleSelectTime(rangeLabel);
                               setOpen(false);
                             }}
-                            className="block text-left px-4 py-2 text-sm font-semibold
-                             text-black whitespace-nowrap hover:bg-blue-100
-                              dark:text-neutral-400 dark:hover:bg-neutral-700"
+                            className="block w-full text-left px-4 py-2 text-sm font-semibold text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
                           >
                             {rangeLabel}
                           </button>
                         ))}
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+
+                {/* ปุ่มเลือกวันที่ */}
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => {
+                    setSelectedDate(e.target.value);
+                    setCurrentPage(1);
+                    setSelectedRowGlobalIndex(null);
+                  }}
+                  className="px-3 py-2 rounded-lg border border-sky-500 text-black shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
+                  aria-label="Select Date"
+                />
               </div>
             </th>
 
             {/* Plant dropdown */}
-            <th className="border border-black w-[10%]">
+            <th className="border px-4 border-black w-[5%]">
               <div className="relative inline-flex" ref={plantDropdownRef}>
                 <button
                   type="button"
@@ -632,7 +657,7 @@ const timeRanges = [
                     ? "bg-caution-1-gradient text-white hover:bg-caution-blue-gradient"
                     : row.Caution === 0.5
                     ? "bg-yellow-400 text-black hover:bg-caution-blue-gradient"
-                    : "bg-normal-gradient text-black"
+                    : "bg-normal-gradient marker: text-black bg-blend-screen"
                 }`}
                 onClick={() => setSelectedRowGlobalIndex(globalIndex)}
               >
@@ -640,8 +665,8 @@ const timeRanges = [
                 <td className="py-2 border">{row.TIME}</td>
 
                 {/* plant row detail */}
-                <td className="py-2 border">
-                  <div className="flex items-center space-x-2">
+                <td className="py-2 border ">
+                  <div className="flex items-center space-x-2 h-full">
                     <UserCircleIcon
                       className="w-6 h-6 cursor-pointer"
                       onClick={(e) => {

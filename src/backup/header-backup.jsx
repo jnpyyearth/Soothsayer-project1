@@ -27,7 +27,7 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
      <div className="flex justify-center items-center h-auto">
       <img
         src={logoImage}
-        className="cursor-pointer w-80 h-auto mx-auto"
+        className="cursor-pointer w-50 h-auto mx-auto"
         id="logolink"
         alt="logosoothsayer"
         onClick={onLogoClick}
