@@ -27,11 +27,11 @@ function SearchBar({ searchTerm, setSearchTerm }) {
   };
 
   return (
-    <div className="relative w-[500px] max-w-xl mt-5">
+    <div className="relative w-[600px] mt-5">
       <MagnifyingGlassIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-neutral-400" />
       <input
         type="text"
-        className="w-full py-2 pl-10 pr-12 rounded-lg border border-gray-700 bg-black
+        className="w-full py-2 pl-10 rounded-lg border border-gray-700 bg-black
       font-custom text-neutral-100
       shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-neutral-400"
         placeholder="Search it"

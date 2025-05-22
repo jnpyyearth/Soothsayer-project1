@@ -309,7 +309,10 @@ const timeRanges = [
   };
 
   return (
-  <div className="p-10 flex flex-col mx-auto overflow-x-hidden" style={{ width: "100vw", maxWidth: "100%" }}>
+    <div
+      className="p-10 flex flex-col mx-auto overflow-hidden "
+      style={{ tableLayout: "fixed" }}
+    >
       <div
         className="md:w-auto flex-col md:flex-row space-y-2 
       md:space-y-0 z-100 align-top"
@@ -323,17 +326,16 @@ const timeRanges = [
         />
       </div>
 
-     <table className="font-custom table-auto border-collapse border text-sm mt-10 w-full">
-        
+      <table className="w-full table-auto  text-sm mt-6 overflow-visible">
         <thead className="bg-headtable-gradient text-lg text-sky-500 ">
           <tr>
-            <th className="border border-black text-sm">
+            <th className="border border-black text-sm w-[10%]">
               {/* Time dropdown */}
               <div className="relative inline-flex" ref={dropdownRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle w-max px-2 
-                  inline-flex items-center gap-x-2 text-sm 
+                  className="hs-dropdown-toggle w-max px-2 py-2
+                  inline-flex items-center gap-x-2 text-base 
                   font-medium rounded-lg border border-sky-500
                    bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
                   aria-haspopup="menu"
@@ -365,12 +367,12 @@ const timeRanges = [
                     className="hs-dropdown-menu transition-[opacity,margin] 
                     duration absolute right-0 z-10 mt-2 ml-5 min-w-fit origin-top-right 
                     rounded-md bg-white shadow-md dark:bg-neutral-800 
-                    dark:border dark:border-neutral-700 max-h-60 overflow-auto"
+                    dark:border dark:border-neutral-700 max-h-60 overflow-visible"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
                   >
-                    <div className="p-1 overflow-x-auto">
+                    <div className="p-5 overflow-x-auto">
                       <div className="min-w-max space-y-1">
                         {/* ปุ่มเลือกช่วงเวลาใหญ่ทั้งหมด */}
                         <button
@@ -391,7 +393,9 @@ const timeRanges = [
                               handleSelectTime(rangeLabel);
                               setOpen(false);
                             }}
-                            className="block text-left px-4 py-2 text-sm font-semibold text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                            className="block text-left px-4 py-2 text-sm font-semibold
+                             text-black whitespace-nowrap hover:bg-blue-100
+                              dark:text-neutral-400 dark:hover:bg-neutral-700"
                           >
                             {rangeLabel}
                           </button>
@@ -403,14 +407,15 @@ const timeRanges = [
               </div>
             </th>
 
-              {/* Plant dropdown */}
-            <th className=" py-2 border border-black">
+            {/* Plant dropdown */}
+            <th className="border border-black w-[10%]">
               <div className="relative inline-flex" ref={plantDropdownRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-2 inline-flex 
-                  items-center text-sm font-medium w-[200] rounded-lg 
-                  border border-sky-500 bg-black text-neutral-100 shadow-white focus:outline-hidden"
+                  className="hs-dropdown-toggle py-2 px-5 inline-flex 
+                  items-center text-base font-medium w-[200] rounded-lg 
+                  border border-sky-500 bg-black text-neutral-100 shadow-white 
+                  focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={plantDropdownOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -418,7 +423,9 @@ const timeRanges = [
                 >
                   {selectedPlant}
                   <svg
-                    className={`size-4 transition-transform ${plantDropdownOpen ? "rotate-180" : ""}`}
+                    className={`size-4 transition-transform ml-1 ${
+                      plantDropdownOpen ? "rotate-180" : ""
+                    }`}
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
                     height="24"
@@ -436,14 +443,14 @@ const timeRanges = [
                 {plantDropdownOpen && (
                   <div
                     className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
-                    right-0 z-10 mt-2 min-w-fit origin-top-right rounded-md
-                     bg-white shadow-md dark:bg-neutral-800 dark:border
-                      dark:border-neutral-700 max-h-60 overflow-auto"
+                   right-0 z-10 mt-2 min-w-[300px] origin-top-right rounded-md
+                    shadow-md bg-black dark:border
+                   border-sky-700 max-h-60 overflow-auto"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
                   >
-                    <div className="p-1 space-y-1">
+                    <div className="p-1 grid grid-cols-2 gap-2 max-h-60 overflow-auto">
                       <button
                         key="all-plants"
                         onClick={() => handleSelectPlant("All Plants")}
@@ -455,7 +462,8 @@ const timeRanges = [
                         <button
                           key={plant}
                           onClick={() => handleSelectPlant(plant)}
-                          className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap dark:text-neutral-400 dark:hover:bg-neutral-700"
+                          className="block w-full text-left px-4 py-2 
+                          text-sm text-black whitespace-nowrap dark:text-neutral-400 dark:hover:bg-neutral-700"
                         >
                           {plant}
                         </button>
@@ -467,12 +475,12 @@ const timeRanges = [
             </th>
 
             {/* Machine dropdown */}
-            <th className=" py-2 border border-black">
+            <th className=" py-2 border border-black w-[10%]">
               <div className="relative inline-flex" ref={machineRef}>
                 <button
                   type="button"
                   className="hs-dropdown-toggle py-2 px-2 inline-flex 
-                  items-center gap-x-2 text-sm font-medium rounded-lg border
+                  items-center gap-x-2 text-base font-medium rounded-lg border
                    border-sky-500 bg-black text-neutral-100 shadow-2xs focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={machineOpen ? "true" : "false"}
@@ -500,7 +508,9 @@ const timeRanges = [
 
                 {machineOpen && (
                   <div
-                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute right-0 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md dark:bg-neutral-800 dark:border dark:border-neutral-700 max-h-60 overflow-auto"
+                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
+                    right-0 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md
+                     dark:bg-neutral-800 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
@@ -516,7 +526,7 @@ const timeRanges = [
                         Select All Machine
                       </button>
 
-                   {machineOption.map((machine) => (
+                      {machineOption.map((machine) => (
                         <button
                           key={machine}
                           onClick={() => handleSelectmachine(machine)}
@@ -532,7 +542,7 @@ const timeRanges = [
             </th>
 
             {/* Components dropdown */}
-            <th className=" py-2 border border-black">
+            <th className=" py-2 border border-black w-[10%]">
               <div className="relative inline-flex" ref={componentsRef}>
                 <button
                   type="button"
@@ -564,10 +574,13 @@ const timeRanges = [
 
                 {componentsOpen && (
                   <div
-                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute right-0 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md dark:bg-neutral-800 dark:border dark:border-neutral-700 max-h-60 overflow-auto"
+                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute z-10 
+                    mt-2 min-w-fit origin-top-center h-auto
+             rounded-md bg-white shadow-md dark:bg-neutral-800 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
+                    style={{ left: "50%", transform: "translateX(-50%)" }}
                   >
                     <div className="p-1 space-y-1 overflow-x-auto">
                       <div className="min-w-max">
@@ -576,12 +589,14 @@ const timeRanges = [
                           onClick={() =>
                             handleSelectcomponent("Select All Components")
                           }
-                          className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700 "
+                          className="block w-full text-left px-4 py-2 text-base
+                           text-black whitespace-nowrap hover:bg-blue-100
+                            dark:text-neutral-400 dark:hover:bg-neutral-700 "
                         >
                           Select All Components
                         </button>
 
-                       {componentsOption.map((component) => (
+                        {componentsOption.map((component) => (
                           <button
                             key={component}
                             onClick={() => handleSelectcomponent(component)}
@@ -597,10 +612,10 @@ const timeRanges = [
               </div>
             </th>
 
-            <th className="py-2 border border-black">Model</th>
-            <th className="py-2 border border-black">Healthscore</th>
-            <th className="py-2 border border-black">Actual value</th>
-            <th className="py-2 border border-black">Units</th>
+            <th className="py-2 border border-black w-[25%]">Model</th>
+            <th className="py-2 border border-black w-[5%]">Healthscore</th>
+            <th className="py-2 border border-black w-[5%]">Actual value</th>
+            <th className="py-2 border border-black w-[5%]">Units</th>
           </tr>
         </thead>
         <tbody>
@@ -616,90 +631,96 @@ const timeRanges = [
                     : row.Caution === 1
                     ? "bg-caution-1-gradient text-white hover:bg-caution-blue-gradient"
                     : row.Caution === 0.5
-                    ? "bg-caution-0.5-gradient text-black hover:bg-caution-blue-gradient"
-                    : "bg-white text-black"
+                    ? "bg-yellow-400 text-black hover:bg-caution-blue-gradient"
+                    : "bg-normal-gradient text-black"
                 }`}
                 onClick={() => setSelectedRowGlobalIndex(globalIndex)}
               >
                 {/* time row detail */}
                 <td className="py-2 border">{row.TIME}</td>
-                
-                 {/* plant row detail */}
-                <td className="py-2 border flex items-center">
-                  <UserCircleIcon
-                    className="w-6 h-5 mr-2 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const plant = row.PLANT;
-                      const tooltip = roleMap[plant];
-                      const htmlContent = (
-                        <div className="mt-4">
-                          <p className="flex items-center gap-2 ">
-                            <UserIcon className="w-5 h-5 inline-block " />
-                            <strong>Machine Diagnostic Engineer</strong> :
-                          </p>
-                          <p
-                            className="inline-flex items-center rounded-md bg-blue-800 
-                          px-4 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 
-                          ring-inset my-2 mx-8"
-                          >
-                            {" "}
-                            {tooltip.engineer}
-                          </p>
-                          <br />
-                          <p className="flex items-center gap-2 mt-2">
-                            <UserIcon className="w-5 h-5 inline-block" />
-                            <strong>Machine Monitoring Officer</strong> :
-                          </p>
-                          <p className="inline-flex items-center rounded-md bg-blue-600 px-4 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 ring-inset my-2 mx-8">
-                            {tooltip.officer}
-                          </p>
-                        </div>
-                      );
-                      const htmlString =
-                        ReactDOMServer.renderToStaticMarkup(htmlContent);
 
-                      Swal.fire({
-                        position: "top-end",
-                        icon: undefined,
-                        title: iconHtml + "Coordinator",
-                        html: htmlString,
-                        toast: true,
-                        showCloseButton: true,
-                        showConfirmButton: false,
-                        background:
-                          "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287)",
-                        color: "#ffffff",
-                        // timer: null,
-                        timer: 3000,
-                        customClass: {
-                          popup: "shadow-md text-sm text-start",
-                          closeButton:
-                            "absolute top-2 right-2 text-white text-lg",
-                        },
-                        showClass: {
-                          popup:
-                            "animate__animated animate__fadeInRight animate__faster",
-                        },
-                        hideClass: {
-                          popup:
-                            "animate__animated animate__fadeOutRight animate__faster",
-                        },
-                        willClose: () => {
-                          document.body.style.overflow = "";
-                        },
-                      });
-                    }}
-                  />
-                  {row.PLANT || "-"}
+                {/* plant row detail */}
+                <td className="py-2 border">
+                  <div className="flex items-center space-x-2">
+                    <UserCircleIcon
+                      className="w-6 h-6 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const plant = row.PLANT;
+                        const tooltip = roleMap[plant];
+                        const htmlContent = (
+                          <div className="mt-4">
+                            <p className="flex items-center gap-2 ">
+                              <UserIcon className="w-5 h-5 inline-block " />
+                              <strong>Machine Diagnostic Engineer</strong> :
+                            </p>
+                            <p
+                              className="inline-flex items-center rounded-md bg-blue-800 
+                              px-4 py-1 text-xs font-medium text-white ring-1 ring-gray-500/10 
+                              ring-inset my-2 mx-8"
+                            >
+                              {tooltip.engineer}
+                            </p>
+                            <br />
+                            <p className="flex items-center gap-2 mt-2">
+                              <UserIcon className="w-5 h-5 inline-block" />
+                              <strong>Machine Monitoring Officer</strong> :
+                            </p>
+                            <p
+                              className="inline-flex items-center rounded-md
+                                         bg-blue-600 px-4 py-1 text-xs font-medium 
+                                         text-white ring-1 ring-gray-500/10 ring-inset my-2 mx-8"
+                            >
+                              {tooltip.officer}
+                            </p>
+                          </div>
+                        );
+                        const htmlString =
+                          ReactDOMServer.renderToStaticMarkup(htmlContent);
+
+                        Swal.fire({
+                          position: "top-end",
+                          icon: undefined,
+                          title: iconHtml + "Coordinator",
+                          html: htmlString,
+                          toast: true,
+                          showCloseButton: true,
+                          showConfirmButton: false,
+                          background:
+                            "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287)",
+                          color: "#ffffff",
+                          timer: 3000,
+                          customClass: {
+                            popup: "shadow-md text-sm text-start",
+                            closeButton:
+                              "absolute top-2 right-2 text-white text-lg",
+                          },
+                          showClass: {
+                            popup:
+                              "animate__animated animate__fadeInRight animate__faster",
+                          },
+                          hideClass: {
+                            popup:
+                              "animate__animated animate__fadeOutRight animate__faster",
+                          },
+                          willClose: () => {
+                            document.body.style.overflow = "";
+                          },
+                        });
+                      }}
+                    />
+                    <span>{row.PLANT || "-"}</span>
+                  </div>
                 </td>
 
                 <td className="py-2 border">{row.MACHINE}</td>
                 <td className="py-2 border">{row.COMPONENT}</td>
 
-                <td className=" border text-center whitespace-normal">
+                <td className=" border text-center whitespace-normal ">
                   <span className="flex items-center space-x-2 w-auto">
-                    <span className="text-sm truncate ">{row.MODEL}</span>
+                    <span className="text-sm py-2 mx-2 truncate  break-words">
+                      {row.MODEL}
+                    </span>
 
                     {typeof row.Note === "string" &&
                       row.Note.trim() !== "" &&
@@ -713,8 +734,11 @@ const timeRanges = [
                               const acknowledge = row.Acknowledge || "N/A";
                               const noteText = row.Note || "No note";
                               const htmlContent = (
-                                <div className="mt-2 w-max">
-                                  <p className="flex items-center gap-2 break-words whitespace-pre-wrap ">
+                                <div className="mt-2 w-max ">
+                                  <p
+                                    className="flex items-center gap-2 break-words
+                                   whitespace-pre-wrap "
+                                  >
                                     <CalendarIcon className="w-6 h-6 inline-block" />
                                     <strong>
                                       Acknowledge Time :
@@ -761,7 +785,7 @@ const timeRanges = [
                                 timer: 3000,
                                 customClass: {
                                   popup:
-                                    "relative shadow-md text-sm text-start",
+                                    "relative shadow-md text-sm text-start overflow-x-hidden",
                                   closeButton:
                                     "absolute top-2 right-2 text-white text-lg",
                                 },
@@ -783,7 +807,7 @@ const timeRanges = [
                       )}
                   </span>
                 </td>
-                
+
                 <td className="py-2 border">{row.HEALTHSCORE}</td>
                 <td className="py-2 border">{row.Actual_Value}</td>
                 <td className="py-2 border">{row.UNITS}</td>
@@ -905,8 +929,21 @@ const timeRanges = [
             count={Math.ceil(filteredData.length / pageSize)}
             page={currentPage}
             onChange={(e, page) => onPageChange(e, page)}
-            color="primary"
-            
+            sx={{
+              "& .MuiPaginationItem-root": {
+                color: "white", // สีข้อความปกติ
+                backgroundColor: "#1e40af", // สีพื้นหลังปกติ
+              },
+              "& .MuiPaginationItem-root.Mui-selected": {
+                color: "#1e40af", // สีข้อความตอนถูกเลือก
+                backgroundColor: "white", // สีพื้นหลังตอนถูกเลือก
+              },
+              "& .MuiPaginationItem-root:hover": {
+                backgroundColor: "#2563eb", // สีพื้นหลังตอน hover
+                color: "white",
+              },
+            }}
+            color="primary" // อันนี้จะยังมีผลอยู่แต่ถ้า override สีด้วย sx จะมีน้ำหนักมากกว่า
           />
         </Stack>
       </div>

@@ -8,36 +8,22 @@
   font-weight: 400;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  /* background-color: #05062d; */
-/* background: linear-gradient(180deg,rgba(6, 8, 51, 1) 0%, rgba(143, 130, 222, 1) 100%); */
-background: linear-gradient(180deg,#060833 0%, rgba(74, 53, 189, 1) 100%);
+background: linear-gradient(180deg,rgba(31, 2, 192, 1) 0%, rgba(36, 129, 166, 1) 100%);
+/* background: linear-gradient(0deg,rgba(80, 187, 229, 1) 0%, rgba(31, 2, 192, 1) 100%); */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 body {
   margin: 0;
   display: flex;
   min-width: 320px;
   min-height: 100vh;
+  flex-direction: column; /* กำหนดให้ child เรียงแนวตั้ง */
+  overflow-x: hidden; /* ซ่อน scrollbar แนวนอน */
 }
-
-/* 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-} */
-/* 
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-} */
 
 @media (prefers-color-scheme: light) {
   :root {

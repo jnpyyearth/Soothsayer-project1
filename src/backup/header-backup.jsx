@@ -23,12 +23,11 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
 
  return (
   <div className="px-6 py-4">
-
     {/* logo อยู่บรรทัดแรก */}
-     <div className="flex justify-center items-center h-12">
+     <div className="flex justify-center items-center h-auto">
       <img
         src={logoImage}
-        className="ml-20 py-6 cursor-pointer w-80 h-auto"
+        className="cursor-pointer w-80 h-auto mx-auto"
         id="logolink"
         alt="logosoothsayer"
         onClick={onLogoClick}
@@ -36,7 +35,7 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
     </div>
 
     {/* searchbar อยู่บรรทัดถัดมา */}
-    <div className="relative w-[400px] mt-10">
+    <div className="relative w-full max-w-md mt-10">
       <SearchBar
         className="w-full"
         searchTerm={searchTerm}

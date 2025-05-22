@@ -21,6 +21,7 @@ export default {
         "caution-0.5-gradient":
           "linear-gradient(to bottom ,oklch(85.2% 0.199 91.936),oklch(90.5% 0.182 98.111))",
         "caution-blue-gradient": "linear-gradient(to top, #3b82f6, #60a5fa)",
+        "normal-gradient":"radial-gradient(circle,rgba(250, 245, 247, 1) 0%, rgba(148, 187, 233, 1) 100%);"
       },
       textColor: {
         black: "#000000",
