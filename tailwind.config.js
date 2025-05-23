@@ -10,10 +10,12 @@ export default {
         custom: ['Rubik', 'sans-serif'],
         audiowide: ['Audiowide', 'cursive'],
         content: ['Oxanium', 'cursive'],
+        kanit: ['Kanit', 'sans-serif'],
       },
 
       // ใช้ gradient แบบกำหนดเอง
       backgroundImage: {
+        "modal-gradient":"background: linear-gradient(90deg,rgba(199, 6, 61, 1) 0%, rgba(13, 13, 140, 1) 35%, rgba(235, 110, 185))",
         "headtable-gradient":
           "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287))",
         "caution-1-gradient":

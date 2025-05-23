@@ -5,3 +5,7 @@
   text-align: center;
 }
 
+.swal2-custom-title {
+  font-size: large;
+  font-weight: bold;
+}

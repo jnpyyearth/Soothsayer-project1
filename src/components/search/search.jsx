@@ -32,7 +32,7 @@ function SearchBar({ searchTerm, setSearchTerm }) {
       <input
         type="text"
         className="w-full py-2 pl-10 rounded-lg border border-gray-700 bg-black
-      font-custom text-neutral-100
+      font-kanit text-neutral-100 text-base
       shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-neutral-400"
         placeholder="Search it"
         value={inputValue}
