@@ -1,18 +1,16 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { UserCircleIcon } from "@heroicons/react/24/solid";
-import {
-  UserGroupIcon,
-  CalendarIcon,
-  UserIcon,
-  ChatBubbleLeftEllipsisIcon,
+import {UserGroupIcon,CalendarIcon,UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,EnvelopeIcon
 } from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
 import Badge from "@mui/material/Badge";
-import MailIcon from "@mui/icons-material/Mail";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import ReactDOMServer from "react-dom/server";
+import {FormControl,FormLabel,RadioGroup,FormControlLabel,Radio,} from '@mui/material';
+// import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 function useMultipleOutsideClick(dropdowns) {
   useEffect(() => {
@@ -51,8 +49,9 @@ function Table() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isClosing, setIsClosing] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
-  const pageSize = 25;
+  const pageSize = 25; //กำหนดให้แสดง 25 แถว
 
+  //ปิด modal ใช้ความเร็วในการ motion 3 วิ
   const closeModalWithFade = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -60,21 +59,16 @@ function Table() {
       setIsClosing(false);
     }, 300);
   };
-
+  
+  //array data engineer & officer
   const roleMap = {
     GSP1: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
     ESP: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
     GSP2: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
     GSP3: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
     GSP4: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
-    GSP5: {
-      engineer: "Piyarach Somwatcharajit",
-      officer: "Issarapong Tumhonyam",
-    },
-    GSP6: {
-      engineer: "Piyarach Somwatcharajit",
-      officer: "Issarapong Tumhonyam",
-    },
+    GSP5: {engineer: "Piyarach Somwatcharajit",officer: "Issarapong Tumhonyam",},
+    GSP6: {engineer: "Piyarach Somwatcharajit",officer: "Issarapong Tumhonyam",},
     GPPP: { engineer: "Apichai Mekha", officer: "Issarapong Tumhonyam" },
   };
 
@@ -88,7 +82,7 @@ function Table() {
   const plantDropdownRef = useRef(null);
 
   const [machineOpen, setmachineopen] = useState(false);
-  const [selectedmachine, setSelectedmachine] = useState("Select All Machine");
+  const [selectedmachine, setSelectedmachine] = useState(" All Machine");
   const machineRef = useRef(null);
 
   const [componentsOpen, setComponentopen] = useState(false);
@@ -128,19 +122,19 @@ function Table() {
     } else {
       setMachineoptions([]);
     }
-    // Reset machine and component selection on plant change
+    // รีเซ็ตตัวเลือก machine และ component เมื่อเลือกชื่อ plant ใหม่
     setSelectedmachine("Select All Machine");
     setComponentsoptions([]);
     setSelectedcomponents("Select All Components");
   }, [selectedPlant, data]);
 
-  // Update components เมื่อเลือก machine หรือ Plant
+  // อัปเดตค่าตัวเลือกชื่อ components เมื่อเลือก machine หรือ Plant
   useEffect(() => {
     if (
       selectedPlant &&
       selectedPlant !== "All Plants" &&
       selectedmachine &&
-      selectedmachine !== "Select All Machine"
+      selectedmachine !== "All Machine"
     ) {
       const components = Array.from(
         new Set(
@@ -156,8 +150,8 @@ function Table() {
     } else {
       setComponentsoptions([]);
     }
-    // Reset component selection on machine change
-    setSelectedcomponents("Select All Components");
+    // รีเซ็ตชื่อ component เมื่อได้เลือกชื่อ machine ใหม่
+    setSelectedcomponents("All Components");
   }, [selectedmachine, selectedPlant, data]);
 
   //fetch api
@@ -171,7 +165,7 @@ function Table() {
     fetchData();
   }, []);
 
-  // set dropdown
+  // ตั้งค่า dropdown โดยใช้ useMemo จัดการการเปิด-ปิด โดยให้จำค่าที่รับจากตัวแปรหรือค่าของarray
   const dropdowns = useMemo(
     () => ({
       timeDropdown: { ref: dropdownRef, isOpen: open, setOpen },
@@ -193,16 +187,18 @@ function Table() {
     }),
     [open, plantDropdownOpen, machineOpen, componentsOpen]
   );
+ 
+  useMultipleOutsideClick(dropdowns); //ฟังก์ชั่นเมื่อคลิกนอกบริเวณให้ปิดพวกmodal dropdownlist โดยอัตโนมัติ
 
-  useMultipleOutsideClick(dropdowns);
-
+  //ช่วงเวลาของ dropdown 4 ช่วง ช่วงละ 6 ชั่วโมง
   const timeRanges = [
     "00:00 - 05:59",
     "06:00 - 11:59",
     "12:00 - 17:59",
     "18:00 - 23:59",
   ];
-
+ 
+  //set การคลิกเลือกแถวหรือdropdown
   const handleSelectTime = (timeRange) => {
     setSelectedTime(timeRange);
     setOpen(false);
@@ -236,7 +232,7 @@ function Table() {
     setCurrentPage(1);
   };
 
- // กรองข้อมูล
+ // กรองข้อมูลตามไฟล์ มาไว้ในแต่ละคอลัมน์ แต่ละแถว
 const filteredData = data.filter((row) => {
   const matchTime = isTimeInRange(row.TIME, selectedTime);
   let rowDateOnly = "";
@@ -249,7 +245,7 @@ const filteredData = data.filter((row) => {
   const matchPlant =
     selectedPlant === "All Plants" || row.PLANT === selectedPlant;
   const matchComponent =
-    selectedcomponents === "Select All Components" ||
+    selectedcomponents === "All Components" ||
     row.COMPONENT === selectedcomponents;
   const matchMachine =
     selectedmachine === "Select All Machine" || row.MACHINE === selectedmachine;
@@ -269,24 +265,25 @@ const filteredData = data.filter((row) => {
     matchSearch
   );
 })
-// การเรียงข้อมูลใหม่จากล่าสุดไปเก่า
+// filter sort ข้อมูลแสดงเดือนล่าสุดก่อน โดยมีกรเรียงค่าcaution
 .sort((a, b) => {
-  // เรียงตาม Caution
+  // กำหนดให้เรียง Caution 1 อยู่บนสุดตามด้วย 0.5 และ 0 
   const cautionOrder = b.Caution - a.Caution; // Caution = 1 อยู่บนสุด, ตามด้วย 0.5, 0
   if (cautionOrder !== 0) return cautionOrder;
   
   // ถ้า Caution เท่ากัน เรียงตามวันที่ (จากใหม่ไปเก่า)
   const dateA = new Date(a.TIME.split(" ")[0].split("/").reverse().join("-"));
   const dateB = new Date(b.TIME.split(" ")[0].split("/").reverse().join("-"));
-  return dateB - dateA; // เรียงจากใหม่ไปเก่า (พฤษภาคมก่อนเมษายน)
+  return dateB - dateA; // เรียงโดยเริ่มจากเดือนล่าสุด 
 });
 
-
+ //ฟิลเตอร์การรีโหลดหน้า
   const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
-
+ 
+  //กำหนดการคลิกlogo แล้วฟอร์ม
   const handleLogoClick = () => {
     if (selectedRowGlobalIndex !== null) {
       setShowModal(true);
@@ -311,7 +308,8 @@ const filteredData = data.filter((row) => {
       });
     }
   };
-
+  
+  //save ข้อมูล caution model ใหม่ และ Post ไปที่ API 
   const handleSave = () => {
     let newCaution =
       action === "custom" ? parseFloat(customCaution) : parseFloat(action);
@@ -350,10 +348,15 @@ const filteredData = data.filter((row) => {
         }
       });
   };
-
+ 
+  //สร้าง html icon ที่จะเรียกใช้แสดงใน swal.fire 
   const iconHtml = ReactDOMServer.renderToStaticMarkup(
     <UserGroupIcon className="inline-block w-5 h-5 mr-2 text-white" />
   );
+   const iconnoteHtml = ReactDOMServer.renderToStaticMarkup(
+    <EnvelopeOpenIcon className="inline-block w-5 h-5 mr-2 text-white" />
+  );
+
 
   function normalizeTime(timeStr) {
     if (!timeStr || typeof timeStr !== "string") return null;
@@ -407,21 +410,21 @@ const filteredData = data.filter((row) => {
       </div>
 
       <table className="w-full table-auto  text-sm mt-6 overflow-visible">
-        <thead className="bg-headtable-gradient text-lg text-sky-500 ">
+        <thead className="bg-headtable-gradient text-lg text-white">
           <tr>
-            <th className="border border-black text-sm w-[10%]">
+            <th className="border border-black text-base w-[10%]">
               {/* Time dropdown */}
               <div className="inline-flex space-x-2 items-center">
                 {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
                 <div
-                  className="relative inline-flex max-w-[140px] "
+                  className="relative inline-flex max-w-[180px] "
                   ref={dropdownRef}
                 >
                   <button
                     type="button"
                     className="hs-dropdown-toggle w-max px-3 py-2
-      inline-flex items-center gap-x-2 text-xs 
-      font-medium rounded-lg border border-sky-500
+      inline-flex items-center gap-x-2 text-base 
+       rounded-lg border border-sky-500
       bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
                     aria-haspopup="menu"
                     aria-expanded={open ? "true" : "false"}
@@ -482,6 +485,10 @@ const filteredData = data.filter((row) => {
                       </div>
                     </div>
                   )}
+                </div>
+
+                <div>
+                  |
                 </div>
 
                 {/* ปุ่มเลือกวันที่ */}
@@ -639,7 +646,7 @@ const filteredData = data.filter((row) => {
               <div className="relative inline-flex" ref={componentsRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-sm 
+                  className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-base
                   font-medium rounded-lg border border-sky-500 bg-black text-neutral-100 shadow-2xs  focus:outline-hidden"
                   aria-haspopup="menu"
                   aria-expanded={componentsOpen ? "true" : "false"}
@@ -680,13 +687,13 @@ const filteredData = data.filter((row) => {
                         <button
                           key="all-components"
                           onClick={() =>
-                            handleSelectcomponent("Select All Components")
+                            handleSelectcomponent("All Components")
                           }
                           className="block w-full text-left px-4 py-2 text-base
                            text-black whitespace-nowrap hover:bg-blue-100
                             dark:text-neutral-400 dark:hover:bg-neutral-700 "
                         >
-                          Select All Components
+                          All Components
                         </button>
 
                         {componentsOption.map((component) => (
@@ -707,7 +714,7 @@ const filteredData = data.filter((row) => {
 
             <th className="py-2 border border-black w-[25%]">Model</th>
             <th className="py-2 border border-black w-[5%]">Healthscore</th>
-            <th className="py-2 border border-black w-[5%]">Actual value</th>
+            <th className="py-2 border border-black w-[8%]">Actual value</th>
             <th className="py-2 border border-black w-[5%]">Units</th>
           </tr>
         </thead>
@@ -735,41 +742,47 @@ const filteredData = data.filter((row) => {
                 }}
               >
                 {/* time row detail */}
-                <td className="py-2 border text-base ">{row.TIME}</td>
+                <td className="py-2 border text-lg">{row.TIME}</td>
                 {/* plant row detail */}
                 <td className="py-2 border text-base ">
                   <div className="flex items-center space-x-2 h-full">
-                    <UserCircleIcon
-                      className="w-6 h-6 cursor-pointer"
+                    <UserGroupIcon
+                      className="w-7 h-7 cursor-pointer rounded-full p-1 bg-indigo-500 text-white ml-3"
                       onClick={(e) => {
                         e.stopPropagation();
                         const plant = row.PLANT;
                         const tooltip = roleMap[plant];
                         const htmlContent = (
-                          <div className="mt-4">
-                            <p className="flex items-center gap-2 text-base">
-                              <UserIcon className="w-5 h-5 inline-block " />
-                              <strong>Machine Diagnostic Engineer</strong> :
-                            </p>
-                            <p
-                              className="inline-flex items-center rounded-md mt-2 bg-blue-800 
-                              px-4 py-1 text-sm font-medium text-white ring-1 ring-gray-500/10 
-                              ring-inset my-2 mx-8"
-                            >
-                              {tooltip.engineer}
-                            </p>
+                          <div className="mt-2 flex flex-col font-kanit">
+                            <div className="flex items-center gap-4 text-lg font-kanit">
+                              <UserIcon className="w-8 h-8 bg-indigo-600 text-white p-1 rounded-full" />
+                              <strong className="whitespace-nowrap">
+                                Machine Diagnostic Engineer :
+                              </strong>
+                              <span
+                                className="inline-flex items-center justify-center rounded-full
+                                 bg-rose-600 px-6 py-1 text-base font-medium text-white
+                                 ring-1 ring-gray-500/10 ring-inset
+                                 max-w-[250px] whitespace-nowrap overflow-hidden text-ellipsis"
+                              >
+                                {tooltip.engineer}
+                              </span>
+                            </div>
                             <br />
-                            <p className="flex items-center gap-2 mt-2 text-base">
-                              <UserIcon className="w-5 h-5 inline-block" />
-                              <strong>Machine Monitoring Officer</strong> :
-                            </p>
-                            <p
-                              className="inline-flex items-center rounded-md
-                                         bg-blue-600 px-4 py-1 text-sm font-medium 
-                                         text-white ring-1 ring-gray-500/10 ring-inset my-2 mx-8"
-                            >
-                              {tooltip.officer}
-                            </p>
+                                  <div className="flex items-center gap-4 text-lg font-kanit">
+                              <UserIcon className="w-8 h-8 bg-indigo-600 text-white p-1 rounded-full" />
+                              <strong className="whitespace-nowrap">
+                                Machine Monitoring Officer :
+                              </strong>
+                              <span
+                                className="inline-flex items-center justify-center rounded-full
+               bg-rose-500 px-6 py-1 text-base font-medium text-white
+               ring-1 ring-gray-500/10 ring-inset
+               max-w-[220px] whitespace-nowrap overflow-hidden text-ellipsis"
+                              >
+                                {tooltip.officer}
+                              </span>
+                            </div>
                           </div>
                         );
                         const htmlString =
@@ -779,17 +792,17 @@ const filteredData = data.filter((row) => {
                           position: "top-end",
                           icon: undefined,
                           html: `
-                          <div class="rounded-md overflow-hidden shadow-lg w-full max-w-md">
-                      <div class="flex items-center justify-between bg-black p-4">
+                          <div class="rounded-md overflow-hidden shadow-lg w-full max-w-xl">
+                      <div class="flex items-center justify-between bg-modal-gradient p-4">
                        <div class="flex items-center space-x-2">
-                       <svg class="w-8 h-8 text-white inline-block bg-red-600 rounded-full p-1" fill="currentColor" viewBox="0 0 24 24">
+                       <svg class="w-8 h-8 text-white inline-block bg-green-600 rounded-full p-1" fill="currentColor" viewBox="0 0 24 24">
                   ${iconHtml}
                   </svg>
                      <span class="text-white text-xl font-bold font-kanit">Coordinator</span>
                         </div>
                        <button id="swalCloseBtn" class="text-white text-2xl font-bold focus:outline-none">&times;</button>
                          </div>
-                                 <div class="p-4 bg-white text-black">
+                                 <div class="p-4 bg-pink-200 text-black">
                                         ${htmlString}
                                   </div>
                          </div>
@@ -801,7 +814,7 @@ const filteredData = data.filter((row) => {
                           color: "#ffffff",
                           timer: null,
                           customClass: {
-                            popup: "shadow-none p-0",
+                            popup: "shadow-none p-0 max-w-xl w-full",
                           },
                           didOpen: () => {
                             // ผูก event ให้ปุ่ม Close ที่เราสร้างเอง
@@ -830,7 +843,7 @@ const filteredData = data.filter((row) => {
                     <span>{row.PLANT || "-"}</span>
                   </div>
                 </td>
-                <td className="py-2 border text-base">{row.MACHINE}</td>
+                <td className="py-2 border text-lg">{row.MACHINE}</td>
                 <td className="py-2 border text-base">{row.COMPONENT}</td>
                 <td className=" border text-center whitespace-normal ">
                   <span className="flex items-center space-x-2 w-auto">
@@ -842,28 +855,28 @@ const filteredData = data.filter((row) => {
                       row.Note.trim().toLowerCase() !== "null" &&
                       row.Note.trim().toLowerCase() !== "undefined" && (
                         <Badge color="secondary" badgeContent={0}>
-                          <MailIcon
-                            className="w-4 h-4 cursor-pointer text-rose-600"
+                          <EnvelopeIcon
+                            className="w-6 h-6 cursor-pointer text-teal-500"
                             onClick={(e) => {
                               e.stopPropagation();
                               const acknowledge = row.Acknowledge || "N/A";
                               const noteText = row.Note || "No note";
                               const htmlContent = (
-                                <div className="mt-2 w-max ">
+                                <div className="mt-2 w-max font-kanit">
                                   <p className="flex items-center gap-2 break-words whitespace-pre-wrap">
-                                    <CalendarIcon className="w-6 h-6 inline-block" />
+                                    <CalendarIcon className="w-8 h-8 inline-block" />
                                     <strong>
                                       Acknowledge Time :
-                                      <span className="inline-flex items-center rounded-md  px-2 py-1 text-base font-bold text-red-600 ring-1 ring-black ring-inset my-2 mx-2">
+                                      <span className="inline-flex items-center  px-2 py-1 text-lg font-bold text-red-600  my-2 mx-2">
                                         {acknowledge}
                                       </span>
                                     </strong>
                                   </p>
 
-                                  <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1">
-                                    <ChatBubbleLeftEllipsisIcon className="w-6 h-6 inline-block" />
+                                  <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1 ">
+                                    <ChatBubbleLeftEllipsisIcon className="w-8 h-8 inline-block " />
                                     <strong> Note: </strong>
-                                    <span className="inline-flex items-center rounded-md bg-green-600 px-2 py-1 text-base font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
+                                    <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-500 px-3 py-1 text-lg font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
                                       {noteText}
                                     </span>
                                   </p>
@@ -878,16 +891,17 @@ const filteredData = data.filter((row) => {
                                 icon: undefined,
                                 html: `
                                    <div class="rounded-md overflow-hidden shadow-lg w-full max-w-md">
-                                      <div class="flex items-center justify-between bg-black p-4">
+                                      <div class="flex items-center justify-between bg-modal-gradient p-4">
                                           <div class="flex items-center space-x-2">
-                                   <svg class="w-8 h-8 text-white inline-block bg-orange-400 rounded-full p-1" fill="currentColor" viewBox="0 0 24 24">
-                                  ${iconHtml}
-                                  </svg>
+                                             <svg class="w-8 h-8 text-white inline-block bg-green-600 rounded-full p-1"
+                                               fill="currentColor" viewBox="0 0 24 24">
+                                               ${iconnoteHtml}
+                                             </svg>
                                     <span class="text-white text-xl font-bold font-kanit">Time & Acknowledge</span>
                                        </div>
                                    <button id="swalCloseBtn" class="text-white text-2xl font-bold focus:outline-none">&times;</button>
                                      </div>
-                                  <div class="p-4 bg-white text-black">
+                                  <div class="p-4 bg-violet-100 text-black">
                                     ${htmlString}
                                       </div>
                                       </div>
@@ -938,70 +952,53 @@ const filteredData = data.filter((row) => {
         </tbody>
       </table>
 
+      {/* render modal ก็ต่อเมื่อมีค่าเป็นtrue และคลิกเลือกแถวแล้ว*/}
       {showModal && selectedRowGlobalIndex !== null && (
-        // bg blur
+        // bg blur จัดกลางจอ
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           {/* bg modal form */}
           <div
-            className={`bg-white text-black p-6 rounded-lg shadow-lg w-[90%] max-w-md
+            className={`bg-pink-200 text-black p-4 rounded-lg shadow-lg w-[90%] max-w-md 
           animate__animated animate__fadeInUp animate__faster  ${
             isClosing ? "animate__fadeOut" : "animate__fadeInUp"
           }
             animate__faster`}
           >
-            <h3 className="text-xl font-semibold mb-4 text">Edit Action Row</h3>
-            <div className="mb-4">
-              <label className="block font-medium mb-1 text-start text-xl">
+            
+            <div className="bg-modal-gradient w-full rounded-xl px-4 py-3">
+              <h3 className="text-xl font-semibold text-white">
+                Edit Caution Row
+              </h3>
+            </div>
+            <div className="mb-4 mt-2">
+              <label className="block font-kanit mb-1 text-start text-xl ">
                 Select Action:
               </label>
 
-              <div className="flex flex-col gap-2 ">
-                <label
-                  htmlFor="action-acknowledge"
-                  className="flex items-center gap-2 cursor-pointer "
+              <FormControl className="font-kanit pl-4">
+                <RadioGroup
+                  aria-labelledby="action-radio-label"
+                  name="action"
+                  value={action}
+                  onChange={(e) => setAction(e.target.value)}
                 >
-                  <input
-                    id="action-acknowledge"
-                    type="radio"
-                    name="action"
+                  <FormControlLabel
                     value="0"
-                    checked={action === "0"}
-                    onChange={(e) => setAction(e.target.value)}
-                    className="cursor-pointer "
+                    control={<Radio />}
+                    label="Acknowledge"
                   />
-                  Acknowledge
-                </label>
-                <label
-                  htmlFor="action-followup"
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    id="action-followup"
-                    type="radio"
-                    name="action"
+                  <FormControlLabel
                     value="0.5"
-                    checked={action === "0.5"}
-                    onChange={(e) => setAction(e.target.value)}
-                    className="cursor-pointer"
+                    control={<Radio />}
+                    label="Follow-up"
                   />
-                  Follow-up
-                </label>
-                <label
-                  htmlFor="action-custom"
-                  className="flex items-center gap-2 cursor-pointer"
-                >
-                  <input
-                    id="action-custom"
-                    type="radio"
-                    name="action"
+                  <FormControlLabel
                     value="custom"
-                    checked={action === "custom"}
-                    onChange={(e) => setAction(e.target.value)}
-                    className="cursor-pointer"
+                    control={<Radio />}
+                    label="Custom"
                   />
-                  Custom
-                </label>
-              </div>
+                </RadioGroup>
+              </FormControl>
             </div>
 
             {action === "custom" && (
@@ -1054,16 +1051,28 @@ const filteredData = data.filter((row) => {
             onChange={(e, page) => onPageChange(e, page)}
             sx={{
               "& .MuiPaginationItem-root": {
-                color: "white", // สีข้อความปกติ
-                backgroundColor: "#1e40af", // สีพื้นหลังปกติ
+                color: "white",
+                backgroundColor: "#1e40af",
+                borderRadius: "100%",
+                fontWeight: "bold",
+                fontSize: "16px",
+               
+                // เพิ่มพื้นที่ให้กับปุ่ม
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af", // สีข้อความตอนถูกเลือก
                 backgroundColor: "white", // สีพื้นหลังตอนถูกเลือก
+                border: "2px solid #1e40af", // ขอบสีตอนเลือก
+                fontWeight: "bold", // ความหนาของข้อความตอนเลือก
               },
               "& .MuiPaginationItem-root:hover": {
                 backgroundColor: "#2563eb", // สีพื้นหลังตอน hover
-                color: "white",
+                color: "white", // สีข้อความตอน hover
+                cursor: "pointer", // เปลี่ยน cursor เป็น pointer ตอน hover
+              },
+              "& .MuiPagination-ul": {
+                padding: "10px", // เพิ่มพื้นที่รอบๆ Pagination
+              
               },
             }}
             color="primary" // อันนี้จะยังมีผลอยู่แต่ถ้า override สีด้วย sx จะมีน้ำหนักมากกว่า

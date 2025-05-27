@@ -15,15 +15,15 @@ export default {
 
       // ใช้ gradient แบบกำหนดเอง
       backgroundImage: {
-        "modal-gradient":"background: linear-gradient(90deg,rgba(199, 6, 61, 1) 0%, rgba(13, 13, 140, 1) 35%, rgba(235, 110, 185))",
+        "modal-gradient":"linear-gradient(90deg,rgba(105, 18, 102, 1) 0%, rgba(219, 0, 80, 1) 50%, rgba(194, 55, 196, 1) 100%)",
         "headtable-gradient":
-          "linear-gradient(to top, oklch(13% 0.028 261.692), oklch(20.8% 0.042 265.755),oklch(27.9% 0.041 260.031),oklch(37.2% 0.044 257.287))",
+          "linear-gradient(180deg,rgba(168, 43, 240, 1) 0%, rgba(75, 14, 244, 1) 100%)",
         "caution-1-gradient":
           "linear-gradient(to top,oklch(50.5% 0.213 27.518),oklch(51.4% 0.222 16.935),oklch(58.6% 0.253 17.585))",
         "caution-0.5-gradient":
           "linear-gradient(to bottom ,oklch(85.2% 0.199 91.936),oklch(90.5% 0.182 98.111))",
         "caution-blue-gradient": "linear-gradient(to top, #3b82f6, #60a5fa)",
-        "normal-gradient":"radial-gradient(circle,rgba(250, 245, 247, 1) 0%, rgba(148, 187, 233, 1) 100%)",
+        "normal-gradient":"radial-gradient(circle,rgba(161, 222, 255, 1) 0%, rgba(203, 233, 242, 1) 100%)",
       },
       textColor: {
         black: "#000000",
