@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import { UserCircleIcon } from "@heroicons/react/24/solid";
-import {UserGroupIcon,CalendarIcon,UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,EnvelopeIcon
-} from "@heroicons/react/24/solid";
+import {UserGroupIcon,CalendarIcon,UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,
+  EnvelopeIcon,WrenchScrewdriverIcon,ComputerDesktopIcon} from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
 import Badge from "@mui/material/Badge";
@@ -9,9 +8,9 @@ import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import ReactDOMServer from "react-dom/server";
 import {FormControl,FormLabel,RadioGroup,FormControlLabel,Radio,} from '@mui/material';
-// import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+//ฟังก์ชั่นกดนอกบริเวณ area ให้ปิดdropdown หรือ modal 
 function useMultipleOutsideClick(dropdowns) {
   useEffect(() => {
     function handleClickOutside(event) {
@@ -40,10 +39,10 @@ function useMultipleOutsideClick(dropdowns) {
 
 function Table() {
   const [data, setData] = useState([]);
-  const [selectedRowGlobalIndex, setSelectedRowGlobalIndex] = useState(null);
+  const [selectedRowGlobalIndex, setSelectedRowGlobalIndex] = useState(null); //เก็บค่าการเลือกแถว
   const [showModal, setShowModal] = useState(false);
-  const [note, setNote] = useState("");
-  const [action, setAction] = useState("0");
+  const [note, setNote] = useState(""); //เก็บค่าnote
+  const [action, setAction] = useState("0"); 
   const [customCaution, setCustomCaution] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,7 +50,7 @@ function Table() {
   const [selectedDate, setSelectedDate] = useState("");
   const pageSize = 25; //กำหนดให้แสดง 25 แถว
 
-  //ปิด modal ใช้ความเร็วในการ motion 3 วิ
+  //ปิด modal ใน 3 วิ
   const closeModalWithFade = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -72,12 +71,12 @@ function Table() {
     GPPP: { engineer: "Apichai Mekha", officer: "Issarapong Tumhonyam" },
   };
 
+  //dropdown open/close value state
   const [open, setOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState("Select All Time");
 
   const dropdownRef = useRef(null);
   const [plantDropdownOpen, setPlantDropdownOpen] = useState(false);
-
   const [selectedPlant, setSelectedPlant] = useState("All Plants");
   const plantDropdownRef = useRef(null);
 
@@ -86,9 +85,7 @@ function Table() {
   const machineRef = useRef(null);
 
   const [componentsOpen, setComponentopen] = useState(false);
-  const [selectedcomponents, setSelectedcomponents] = useState(
-    "Select All Components"
-  );
+  const [selectedcomponents, setSelectedcomponents] = useState("Select All Components");
   const componentsRef = useRef(null);
 
   // option dropdown plant-machine-components
@@ -108,7 +105,7 @@ function Table() {
     }
   }, [data]);
 
-  //load data
+  //load data plant in row 
   useEffect(() => {
     if (selectedPlant && selectedPlant !== "All Plants") {
       const machines = Array.from(
@@ -128,7 +125,7 @@ function Table() {
     setSelectedcomponents("Select All Components");
   }, [selectedPlant, data]);
 
-  // อัปเดตค่าตัวเลือกชื่อ components เมื่อเลือก machine หรือ Plant
+  // อัปเดต/รีเซ็ตตัวเลือก dropdown-list components เมื่อเลือก machine หรือ Plant ใหม่
   useEffect(() => {
     if (
       selectedPlant &&
@@ -150,7 +147,7 @@ function Table() {
     } else {
       setComponentsoptions([]);
     }
-    // รีเซ็ตชื่อ component เมื่อได้เลือกชื่อ machine ใหม่
+ // รีเซ็ตตัวเลือก dropdown-list component เมื่อได้เลือกชื่อ machine ใหม่
     setSelectedcomponents("All Components");
   }, [selectedmachine, selectedPlant, data]);
 
@@ -161,11 +158,23 @@ function Table() {
       .then((json) => setData(json))
       .catch((err) => console.error(err));
   };
+
+  useEffect(() => {fetchData();}, []);
+ 
+  //รีเฟรชหน้าอัตโนมัติทุกครั้งที่นาฬิกาเดินถึง “นาทีที่ 31 วินาทีที่ 0”
   useEffect(() => {
-    fetchData();
+    const interval = setInterval(() => {
+      const now = new Date();
+      if (now.getMinutes() === 31 && now.getSeconds() === 0) {
+        window.location.reload();
+      }
+    }, 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  // ตั้งค่า dropdown โดยใช้ useMemo จัดการการเปิด-ปิด โดยให้จำค่าที่รับจากตัวแปรหรือค่าของarray
+  // ตั้งค่า dropdown โดยใช้ Hook "useMemo" ให้จดจำค่าที่รับจากตัวแปรหรือค่าของarray
+  //ในกรณีนี้จะเก็บค่าของ plant machine และ components ที่มีข้อมูลที่เชื่อมโยงซึ่งกันและกัน 
+  // หากเลือก plant มา ข้อมูลของmachine จะนำค่าข้อมูลที่มีอยู่ในplant นั้นมาแสดงทั้งหมดใน dropdownlist และสำหรับcomponent ก็ใช้หลักการเดียวกัน
   const dropdowns = useMemo(
     () => ({
       timeDropdown: { ref: dropdownRef, isOpen: open, setOpen },
@@ -198,7 +207,7 @@ function Table() {
     "18:00 - 23:59",
   ];
  
-  //set การคลิกเลือกแถวหรือdropdown
+  //setting  การคลิกเลือกเปิดdropdown 
   const handleSelectTime = (timeRange) => {
     setSelectedTime(timeRange);
     setOpen(false);
@@ -227,17 +236,18 @@ function Table() {
     setCurrentPage(1);
   };
 
+  //setting การเสิร์ช
   const handleSearchTermChange = (term) => {
     setSearchTerm(term);
     setCurrentPage(1);
   };
 
- // กรองข้อมูลตามไฟล์ มาไว้ในแต่ละคอลัมน์ แต่ละแถว
+ // กรองข้อมูลตามไฟล์ มาไว้ในแต่ละคอลัมน์ แต่ละแถวในตาราง
 const filteredData = data.filter((row) => {
   const matchTime = isTimeInRange(row.TIME, selectedTime);
   let rowDateOnly = "";
   if (row.TIME) {
-    // แปลงจาก DD/MM/YYYY เป็น YYYY-MM-DD
+    // แปลงวันที่จากรูปแบบ DD/MM/YYYY เป็น YYYY-MM-DD 
     const [day, month, year] = row.TIME.split(" ")[0].split("/");
     rowDateOnly = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
   }
@@ -271,7 +281,7 @@ const filteredData = data.filter((row) => {
   const cautionOrder = b.Caution - a.Caution;
   if (cautionOrder !== 0) return cautionOrder;
 
-  // แปลงแค่วันที่ (ไม่เอาเวลามาคิด)
+  // แปลงแค่วันที่ (โดยไม่เอาเวลามาคิด)
   function parseDate(dateTimeStr) {
     if (!dateTimeStr) return new Date(0);
     const [datePart] = dateTimeStr.split(" ");
@@ -303,7 +313,6 @@ const filteredData = data.filter((row) => {
   const timeB = parseTimeInMinutes(b.TIME);
   return timeB - timeA;
 });
-
 
  //ฟิลเตอร์การรีโหลดหน้า
   const paginatedData = filteredData.slice(
@@ -415,13 +424,14 @@ const filteredData = data.filter((row) => {
     return timeMin >= startMin && timeMin <= endMin;
   }
 
+  //setting การchange ของ page
   const onPageChange = (e, page) => {
     setCurrentPage(page);
   };
 
   return (
     <div
-      className="p-10 flex flex-col mx-auto font-kanit overflow-hidden "
+      className="p-10 flex flex-col mx-auto font-kanit  "
       style={{ tableLayout: "fixed" }}
     >
       <div
@@ -440,7 +450,7 @@ const filteredData = data.filter((row) => {
       <table className="w-full table-auto  text-sm mt-6 overflow-visible">
         <thead className="bg-headtable-gradient text-lg text-white ">
           <tr>
-            <th className="border  border-black  text-base w-[15%] p-1">
+            <th className="border  border-black  text-base w-[15%] px-1 py-3">
               {/* Time dropdown */}
               <div className="inline-flex space-x-2 items-center">
                 {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
@@ -452,7 +462,7 @@ const filteredData = data.filter((row) => {
                     type="button"
                     className="hs-dropdown-toggle w-max px-3 py-2
                      inline-flex items-center gap-x-2 text-base 
-                       rounded-lg border border-sky-500
+                       rounded-lg border-2 border-sky-300
                       bg-indigo-900 text-white shadow-2xs focus:outline-hidden"
                     aria-haspopup="menu"
                     aria-expanded={open ? "true" : "false"}
@@ -521,7 +531,7 @@ const filteredData = data.filter((row) => {
                   )}
                 </div>
 
-                <div>|</div>
+                <div className="font-kanit text-base"> | </div>
 
                 {/* ปุ่มเลือกวันที่ */}
                 <input
@@ -532,7 +542,7 @@ const filteredData = data.filter((row) => {
                     setCurrentPage(1);
                     setSelectedRowGlobalIndex(null);
                   }}
-                  className="px-3 py-2 rounded-lg border border-sky-500 bg-indigo-900 text-white
+                  className="px-3 py-2 rounded-lg border-2 border-sky-300 bg-indigo-900 text-white
                   shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer"
                   aria-label="Select Date"
                 />
@@ -616,8 +626,7 @@ const filteredData = data.filter((row) => {
                 <button
                   type="button"
                   className="hs-dropdown-toggle py-2 px-2 inline-flex 
-                  items-center gap-x-2 text-base font-medium rounded-lg border
-                   border-sky-500 bg-indigo-900 text-white shadow-2xs focus:outline-hidden "
+                  items-center gap-x-2 text-base font-medium rounded-lg border-2 border-sky-300 bg-indigo-900 text-white shadow-2xs focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={machineOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -759,7 +768,7 @@ const filteredData = data.filter((row) => {
                             <button
                               key={component}
                               onClick={() => handleSelectcomponent(component)}
-                              className="block w-full text-left px-4 py-2 text-base text-amber-300 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
+                              className="block w-full text-left px-4 py-2 text-base text-amber-200 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
                             >
                               {component}
                             </button>
@@ -785,14 +794,14 @@ const filteredData = data.filter((row) => {
             return (
               <tr
                 key={globalIndex}
-                className={`cursor-pointer hover:bg-blue-500 ${
+                className={`cursor-pointer transition duration-200 ease-in-out ${
                   isSelected
-                    ? "bg-fuchsia-600 text-white"
+                    ? "bg-green-500 text-white"
                     : row.Caution === 1
                     ? "bg-caution-1-gradient text-white hover:bg-caution-blue-gradient"
                     : row.Caution === 0.5
-                    ? "bg-yellow-400 text-black hover:bg-caution-blue-gradient"
-                    : "bg-normal-gradient marker: text-black bg-blend-screen"
+                    ? "bg-yellow-400 text-black hover:bg-caution-blue-gradient "
+                    : "bg-normal-gradient marker: text-black hover:bg-caution-blue-gradient"
                 }`}
                 onClick={() => setSelectedRowGlobalIndex(globalIndex)}
                 // เลือกแถว + เปิด modal edit ทันที
@@ -809,37 +818,40 @@ const filteredData = data.filter((row) => {
                     <UserGroupIcon
                       className="w-7 h-7 cursor-pointer rounded-full p-1 bg-indigo-600 text-white ml-3"
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation(); 
                         const plant = row.PLANT;
                         const tooltip = roleMap[plant];
                         const htmlContent = (
                           <div className="mt-2 flex flex-col font-kanit">
                             <div className="flex items-center gap-2 text-lg font-kanit">
-                              <UserIcon className="w-8 h-8 bg-indigo-600 text-white p-1 rounded-full" />
+                              <WrenchScrewdriverIcon className="w-9 h-9 bg-indigo-700 
+                              text-white p-1 rounded-full" />
                               <strong className="whitespace-nowrap">
                                 Machine Diagnostic Engineer :
                               </strong>
                               <span
                                 className="inline-flex items-center justify-center rounded-full
-                                 bg-rose-600 px-6 py-1 text-base font-medium text-white
+                                 bg-rose-600 px-4 py-1 text-base font-medium text-white
                                  ring-1 ring-gray-500/10 ring-inset
                                  max-w-[350px] whitespace-nowrap overflow-hidden text-ellipsis"
                               >
+                                
                                 {tooltip.engineer}
                               </span>
                             </div>
                             <br />
                             <div className="flex items-center gap-2 text-lg font-kanit">
-                              <UserIcon className="w-8 h-8 bg-indigo-600 text-white p-1 rounded-full" />
+                              <ComputerDesktopIcon className="w-9 h-9 bg-indigo-700 text-white p-1 rounded-full" />
                               <strong className="whitespace-nowrap">
                                 Machine Monitoring Officer :
                               </strong>
                               <span
                                 className="inline-flex items-center justify-center rounded-full
-                                bg-rose-500 px-6 py-1 text-base font-medium text-white
+                                bg-rose-500 px-4 py-1 text-base font-medium text-white
                               ring-1 ring-gray-500/10 ring-inset
                               max-w-[300px] whitespace-nowrap overflow-hidden text-ellipsis"
                               >
+                               
                                 {tooltip.officer}
                               </span>
                             </div>
@@ -916,7 +928,7 @@ const filteredData = data.filter((row) => {
                       row.Note.trim().toLowerCase() !== "undefined" && (
                         <Badge color="secondary" badgeContent={0}>
                           <EnvelopeIcon
-                            className="w-6 h-6 cursor-pointer text-green-500"
+                            className="w-6 h-6 cursor-pointer text-indigo-700"
                             onClick={(e) => {
                               e.stopPropagation();
                               const acknowledge = row.Acknowledge || "N/A";
@@ -1021,13 +1033,13 @@ const filteredData = data.filter((row) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           {/* bg modal form */}
           <div
-            className={`bg-pink-200 text-black p-4 rounded-lg shadow-lg w-[90%] max-w-md 
+            className={`bg-sky-200 text-black p-4 rounded-lg shadow-lg w-[90%] max-w-md 
           animate__animated animate__fadeInUp animate__faster  ${
             isClosing ? "animate__fadeOut" : "animate__fadeInUp"
           }
             animate__faster`}
           >
-            <div className="bg-modal-gradient w-full rounded-xl px-4 py-3">
+            <div className="bg-form-modal-gradient w-full rounded-xl px-4 py-3">
               <h3 className="text-xl font-semibold text-white">
                 Edit Caution Row
               </h3>
@@ -1069,7 +1081,7 @@ const filteredData = data.filter((row) => {
                   Enter Custom Caution Value:
                 </label>
                 <textarea
-                  className="w-full border border-gray-300 bg-white rounded px-3 py-2 text-black"
+                  className="w-full border border-gray-300 bg-cyan-50 rounded px-3 py-2 text-black"
                   value={customCaution}
                   onChange={(e) => setCustomCaution(e.target.value)}
                   rows={3}
@@ -1080,7 +1092,7 @@ const filteredData = data.filter((row) => {
             <div className="mb-4">
               <label className="block font-medium mb-1 text-start">Note:</label>
               <textarea
-                className="w-full border border-gray-300 bg-white rounded px-3 py-2 text-black"
+                className="w-full border border-gray-300 bg-cyan-50 rounded px-3 py-2 text-black"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 rows={3}

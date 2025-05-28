@@ -27,13 +27,13 @@ function SearchBar({ searchTerm, setSearchTerm }) {
   };
 
   return (
-    <div className="relative w-[600px] mt-5">
-      <MagnifyingGlassIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-sky-200" />
+    <div className="relative w-[550px] mt-5">
+      <MagnifyingGlassIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-indigo-800" />
       <input
         type="text"
-        className="w-full py-2 pl-10 rounded-lg border border-gray-700 bg-indigo-600
-      font-kanit text-sky-100 text-base
-      shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-200 placeholder:text-sky-200 "
+        className="w-full py-2 pl-10 rounded-full border border-gray-700 bg-sky-100
+      font-kanit text-indigo-800 text-lg
+      shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-200 placeholder:text-indigo-700 "
         placeholder="Search it"
         value={inputValue}
         onChange={handleChange}

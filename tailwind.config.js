@@ -15,9 +15,12 @@ export default {
 
       // ใช้ gradient แบบกำหนดเอง
       backgroundImage: {
-        "modal-gradient":"linear-gradient(90deg,rgba(105, 18, 102, 1) 0%, rgba(219, 0, 80, 1) 50%, rgba(194, 55, 196, 1) 100%)",
+        "form-modal-gradient": 
+          "linear-gradient(0deg,rgba(103, 0, 247, 1) 27%, rgba(0, 8, 255, 1) 100%)",
+        "modal-gradient":
+          "linear-gradient(90deg,rgba(105, 18, 102, 1) 0%, rgba(219, 0, 80, 1) 50%, rgba(194, 55, 196, 1) 100%)",
         "headtable-gradient":
-          "linear-gradient(180deg,rgba(168, 43, 240, 1) 0%, rgba(75, 14, 244, 1) 100%)",
+          "linear-gradient(0deg,rgba(77, 13, 166, 1) 27%, rgba(31, 43, 209, 1) 100%)",
         "caution-1-gradient":
           "linear-gradient(to top,oklch(50.5% 0.213 27.518),oklch(51.4% 0.222 16.935),oklch(58.6% 0.253 17.585))",
         "caution-0.5-gradient":
