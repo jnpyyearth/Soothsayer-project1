@@ -431,7 +431,7 @@ const filteredData = data.filter((row) => {
 
   return (
     <div
-      className="p-10 flex flex-col mx-auto font-kanit  "
+      className="p-8 flex flex-col mx-auto font-kanit  "
       style={{ tableLayout: "fixed" }}
     >
       <div
@@ -794,7 +794,7 @@ const filteredData = data.filter((row) => {
             return (
               <tr
                 key={globalIndex}
-                className={`cursor-pointer transition duration-200 ease-in-out ${
+                className={`cursor-pointer transition duration-300 ease-in-out ${
                   isSelected
                     ? "bg-green-500 text-white"
                     : row.Caution === 1
@@ -818,14 +818,16 @@ const filteredData = data.filter((row) => {
                     <UserGroupIcon
                       className="w-7 h-7 cursor-pointer rounded-full p-1 bg-indigo-600 text-white ml-3"
                       onClick={(e) => {
-                        e.stopPropagation(); 
+                        e.stopPropagation();
                         const plant = row.PLANT;
                         const tooltip = roleMap[plant];
                         const htmlContent = (
                           <div className="mt-2 flex flex-col font-kanit">
                             <div className="flex items-center gap-2 text-lg font-kanit">
-                              <WrenchScrewdriverIcon className="w-9 h-9 bg-indigo-700 
-                              text-white p-1 rounded-full" />
+                              <WrenchScrewdriverIcon
+                                className="w-9 h-9 bg-indigo-700 
+                              text-white p-1 rounded-full"
+                              />
                               <strong className="whitespace-nowrap">
                                 Machine Diagnostic Engineer :
                               </strong>
@@ -835,7 +837,6 @@ const filteredData = data.filter((row) => {
                                  ring-1 ring-gray-500/10 ring-inset
                                  max-w-[350px] whitespace-nowrap overflow-hidden text-ellipsis"
                               >
-                                
                                 {tooltip.engineer}
                               </span>
                             </div>
@@ -851,7 +852,6 @@ const filteredData = data.filter((row) => {
                               ring-1 ring-gray-500/10 ring-inset
                               max-w-[300px] whitespace-nowrap overflow-hidden text-ellipsis"
                               >
-                               
                                 {tooltip.officer}
                               </span>
                             </div>
@@ -1129,8 +1129,10 @@ const filteredData = data.filter((row) => {
                 backgroundColor: "#1e40af",
                 borderRadius: "100%",
                 fontWeight: "bold",
-                fontSize: "16px",
-                // เพิ่มพื้นที่ให้กับปุ่ม
+                fontSize: "20px", // ปรับขนาดตัวอักษรให้ใหญ่ขึ้น
+                padding: "10px", // เพิ่ม padding ให้ปุ่มใหญ่ขึ้น
+                width: "40px", // กำหนดความกว้างให้ปุ่ม
+                height: "40px", // กำหนดความสูงให้ปุ่ม
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af", // สีข้อความตอนถูกเลือก
