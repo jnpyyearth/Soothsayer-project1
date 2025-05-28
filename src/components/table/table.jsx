@@ -265,17 +265,45 @@ const filteredData = data.filter((row) => {
     matchSearch
   );
 })
-// filter sort ข้อมูลแสดงเดือนล่าสุดก่อน โดยมีกรเรียงค่าcaution
+// filter sort ข้อมูลแสดงเดือนล่าสุดก่อน โดยมีการเรียงค่าcaution
 .sort((a, b) => {
-  // กำหนดให้เรียง Caution 1 อยู่บนสุดตามด้วย 0.5 และ 0 
-  const cautionOrder = b.Caution - a.Caution; // Caution = 1 อยู่บนสุด, ตามด้วย 0.5, 0
+  // เรียง Caution ก่อน
+  const cautionOrder = b.Caution - a.Caution;
   if (cautionOrder !== 0) return cautionOrder;
-  
-  // ถ้า Caution เท่ากัน เรียงตามวันที่ (จากใหม่ไปเก่า)
-  const dateA = new Date(a.TIME.split(" ")[0].split("/").reverse().join("-"));
-  const dateB = new Date(b.TIME.split(" ")[0].split("/").reverse().join("-"));
-  return dateB - dateA; // เรียงโดยเริ่มจากเดือนล่าสุด 
+
+  // แปลงแค่วันที่ (ไม่เอาเวลามาคิด)
+  function parseDate(dateTimeStr) {
+    if (!dateTimeStr) return new Date(0);
+    const [datePart] = dateTimeStr.split(" ");
+    const [day, month, year] = datePart.split("/");
+    const dayPadded = day.padStart(2, "0");
+    const monthPadded = month.padStart(2, "0");
+    return new Date(`${year}-${monthPadded}-${dayPadded}`);
+  }
+
+  // แปลงเวลาเฉพาะชั่วโมงและนาที (แปลงเป็นนาที)
+  function parseTimeInMinutes(dateTimeStr) {
+    if (!dateTimeStr) return 0;
+    const parts = dateTimeStr.split(" ");
+    const timePart = parts.length > 1 ? parts[1] : "00:00";
+    const [hh, mm] = timePart.split(":");
+    return parseInt(hh) * 60 + parseInt(mm);
+  }
+
+  const dateA = parseDate(a.TIME);
+  const dateB = parseDate(b.TIME);
+
+  // ถ้าวันต่างกัน ให้เรียงวันที่ (เดือนล่าสุดก่อน)
+  if (dateB.getTime() !== dateA.getTime()) {
+    return dateB - dateA;
+  }
+
+  // ถ้าวันเดียวกัน ให้เรียงเวลาจากมากไปน้อย (ชั่วโมงล่าสุดก่อน)
+  const timeA = parseTimeInMinutes(a.TIME);
+  const timeB = parseTimeInMinutes(b.TIME);
+  return timeB - timeA;
 });
+
 
  //ฟิลเตอร์การรีโหลดหน้า
   const paginatedData = filteredData.slice(
@@ -410,9 +438,9 @@ const filteredData = data.filter((row) => {
       </div>
 
       <table className="w-full table-auto  text-sm mt-6 overflow-visible">
-        <thead className="bg-headtable-gradient text-lg text-white">
+        <thead className="bg-headtable-gradient text-lg text-white ">
           <tr>
-            <th className="border border-black text-base w-[10%]">
+            <th className="border  border-black  text-base w-[15%] p-1">
               {/* Time dropdown */}
               <div className="inline-flex space-x-2 items-center">
                 {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
@@ -423,9 +451,9 @@ const filteredData = data.filter((row) => {
                   <button
                     type="button"
                     className="hs-dropdown-toggle w-max px-3 py-2
-      inline-flex items-center gap-x-2 text-base 
-       rounded-lg border border-sky-500
-      bg-black text-neutral-100 shadow-2xs focus:outline-hidden"
+                     inline-flex items-center gap-x-2 text-base 
+                       rounded-lg border border-sky-500
+                      bg-indigo-900 text-white shadow-2xs focus:outline-hidden"
                     aria-haspopup="menu"
                     aria-expanded={open ? "true" : "false"}
                     aria-label="Dropdown"
@@ -452,9 +480,11 @@ const filteredData = data.filter((row) => {
 
                   {open && (
                     <div
-                      className="hs-dropdown-menu transition-[opacity,margin] duration absolute right-0 z-10 mt-2
-                      rounded-md bg-white shadow-md dark:bg-neutral-800
-                      dark:border dark:border-neutral-700 max-h-60 overflow-auto min-w-[180px]"
+                      className="hs-dropdown-menu transition-[opacity,margin] duration 
+                      absolute right-0 z-10 mt-2
+                      rounded-md bg-white shadow-md dark:bg-indigo-950
+                      dark:border dark:border-neutral-700 max-h-60 overflow-auto min-w-[180px]
+                      "
                       role="menu"
                       aria-orientation="vertical"
                       aria-labelledby="hs-dropdown-hover-event"
@@ -465,7 +495,9 @@ const filteredData = data.filter((row) => {
                             handleSelectTime("Select All Time");
                             setOpen(false);
                           }}
-                          className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                          className="block w-full text-left px-4 py-2 text-base
+                           text-teal-400 whitespace-nowrap 
+                             dark:hover:bg-neutral-600"
                         >
                           Select All Time
                         </button>
@@ -477,7 +509,9 @@ const filteredData = data.filter((row) => {
                               handleSelectTime(rangeLabel);
                               setOpen(false);
                             }}
-                            className="block w-full text-left px-4 py-2 text-sm font-semibold text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                            className="block w-full text-left px-4 py-2 
+                            text-base font-semibold whitespace-nowrap
+                             hover:bg-blue-100 dark:text-blue-200 dark:hover:bg-neutral-700"
                           >
                             {rangeLabel}
                           </button>
@@ -487,9 +521,7 @@ const filteredData = data.filter((row) => {
                   )}
                 </div>
 
-                <div>
-                  |
-                </div>
+                <div>|</div>
 
                 {/* ปุ่มเลือกวันที่ */}
                 <input
@@ -500,7 +532,7 @@ const filteredData = data.filter((row) => {
                     setCurrentPage(1);
                     setSelectedRowGlobalIndex(null);
                   }}
-                  className="px-3 py-2 rounded-lg border border-sky-500 text-white bg-black
+                  className="px-3 py-2 rounded-lg border border-sky-500 bg-indigo-900 text-white
                   shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer"
                   aria-label="Select Date"
                 />
@@ -514,7 +546,7 @@ const filteredData = data.filter((row) => {
                   type="button"
                   className="hs-dropdown-toggle py-2 px-5 inline-flex 
                   items-center text-base font-medium w-[200] rounded-lg 
-                  border border-sky-500 bg-black text-neutral-100 shadow-white 
+                  border border-sky-500 bg-slate-300 text-slate-800 shadow-white 
                   focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={plantDropdownOpen ? "true" : "false"}
@@ -543,9 +575,10 @@ const filteredData = data.filter((row) => {
                 {plantDropdownOpen && (
                   <div
                     className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
-                   right-0 z-10 mt-2 min-w-[300px] origin-top-right rounded-md
-                    shadow-md bg-black dark:border
-                   border-sky-700 max-h-60 overflow-auto"
+                   left-1/2 transform -translate-x-1/2
+                    z-10 mt-2 min-w-[300px] origin-top-right rounded-md shadow-md
+                     dark:bg-indigo-950
+                    max-h-60 overflow-auto"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
@@ -554,7 +587,9 @@ const filteredData = data.filter((row) => {
                       <button
                         key="all-plants"
                         onClick={() => handleSelectPlant("All Plants")}
-                        className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                        className="block w-full text-center px-2 py-2 text-base
+                          whitespace-nowrap hover:bg-blue-100
+                          text-teal-400 dark:hover:bg-neutral-700"
                       >
                         All Plants
                       </button>
@@ -562,8 +597,9 @@ const filteredData = data.filter((row) => {
                         <button
                           key={plant}
                           onClick={() => handleSelectPlant(plant)}
-                          className="block w-full text-left px-4 py-2 
-                          text-sm text-black whitespace-nowrap dark:text-neutral-400 dark:hover:bg-neutral-700"
+                          className="block w-full px-2 py-2 
+                          text-base  whitespace-nowrap text-green-200
+                           dark:hover:bg-neutral-700 text-center"
                         >
                           {plant}
                         </button>
@@ -575,13 +611,13 @@ const filteredData = data.filter((row) => {
             </th>
 
             {/* Machine dropdown */}
-            <th className=" py-2 border border-black w-[10%]">
+            <th className=" py-2  border border-black w-[11%]">
               <div className="relative inline-flex" ref={machineRef}>
                 <button
                   type="button"
                   className="hs-dropdown-toggle py-2 px-2 inline-flex 
                   items-center gap-x-2 text-base font-medium rounded-lg border
-                   border-sky-500 bg-black text-neutral-100 shadow-2xs focus:outline-hidden "
+                   border-sky-500 bg-indigo-900 text-white shadow-2xs focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={machineOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -609,32 +645,46 @@ const filteredData = data.filter((row) => {
                 {machineOpen && (
                   <div
                     className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
-                    right-0 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md
-                     dark:bg-neutral-800 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
+                     left-1/2 transform -translate-x-1/2 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md
+                     dark:bg-indigo-950 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
                   >
                     <div className="p-1 space-y-1">
-                      <button
-                        key="all-machines"
-                        onClick={() =>
-                          handleSelectmachine("Select All Machine")
-                        }
-                        className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
-                      >
-                        Select All Machine
-                      </button>
-
-                      {machineOption.map((machine) => (
-                        <button
-                          key={machine}
-                          onClick={() => handleSelectmachine(machine)}
-                          className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                      <div className="min-w-max">
+                        <div
+                          className="grid gap-1 p-1 max-h-80 overflow-auto"
+                          style={{
+                            gridTemplateColumns: `repeat(${
+                              machineOption.length <= 4 ? 1 : 2
+                            }, 1fr)`, // ถ้ามี 4 หรือ น้อยกว่านั้น ให้แสดง 1 คอลัมน์
+                            // ถ้ามีมากกว่า 4 ตัว ให้แสดง 2 คอลัมน์
+                          }}
                         >
-                          {machine}
-                        </button>
-                      ))}
+                          <button
+                            key="all-machines"
+                            onClick={() =>
+                              handleSelectmachine("Select All Machine")
+                            }
+                            className="block w-full text-left px-4 py-2
+                        text-base text-teal-400 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
+                          >
+                            Select All Machine
+                          </button>
+
+                          {machineOption.map((machine) => (
+                            <button
+                              key={machine}
+                              onClick={() => handleSelectmachine(machine)}
+                              className="block w-full text-left px-4 py-2 text-base text-amber-300 whitespace-nowrap
+                           hover:bg-blue-100  dark:hover:bg-neutral-700"
+                            >
+                              {machine}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -647,7 +697,7 @@ const filteredData = data.filter((row) => {
                 <button
                   type="button"
                   className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-base
-                  font-medium rounded-lg border border-sky-500 bg-black text-neutral-100 shadow-2xs  focus:outline-hidden"
+                  font-medium rounded-lg border border-sky-500 bg-slate-300 text-slate-800 shadow-2xs  focus:outline-hidden"
                   aria-haspopup="menu"
                   aria-expanded={componentsOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -676,7 +726,7 @@ const filteredData = data.filter((row) => {
                   <div
                     className="hs-dropdown-menu transition-[opacity,margin] duration absolute z-10 
                     mt-2 min-w-fit origin-top-center h-auto
-             rounded-md bg-white shadow-md dark:bg-neutral-800 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
+             rounded-md bg-white shadow-md dark:bg-indigo-950 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
                     role="menu"
                     aria-orientation="vertical"
                     aria-labelledby="hs-dropdown-hover-event"
@@ -684,27 +734,37 @@ const filteredData = data.filter((row) => {
                   >
                     <div className="p-1 space-y-1 overflow-x-auto">
                       <div className="min-w-max">
-                        <button
-                          key="all-components"
-                          onClick={() =>
-                            handleSelectcomponent("All Components")
-                          }
-                          className="block w-full text-left px-4 py-2 text-base
-                           text-black whitespace-nowrap hover:bg-blue-100
-                            dark:text-neutral-400 dark:hover:bg-neutral-700 "
+                        <div
+                          className="grid gap-1 p-1 max-h-80 overflow-auto"
+                          style={{
+                            gridTemplateColumns: `repeat(${
+                              componentsOption.length <= 4 ? 1 : 2
+                            }, 1fr)`, // ถ้ามี 4 หรือ น้อยกว่านั้น ให้แสดง 1 คอลัมน์,
+                            // ถ้ามากกว่า4 ให้แสดง 2 คอลัมน์
+                          }}
                         >
-                          All Components
-                        </button>
-
-                        {componentsOption.map((component) => (
                           <button
-                            key={component}
-                            onClick={() => handleSelectcomponent(component)}
-                            className="block w-full text-left px-4 py-2 text-sm text-black whitespace-nowrap hover:bg-blue-100 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                            key="all-components"
+                            onClick={() =>
+                              handleSelectcomponent("All Components")
+                            }
+                            className="block w-full text-left px-4 py-2 text-base
+                            whitespace-nowrap hover:bg-blue-100
+                     text-teal-400 dark:hover:bg-neutral-700 "
                           >
-                            {component}
+                            All Components
                           </button>
-                        ))}
+
+                          {componentsOption.map((component) => (
+                            <button
+                              key={component}
+                              onClick={() => handleSelectcomponent(component)}
+                              className="block w-full text-left px-4 py-2 text-base text-amber-300 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
+                            >
+                              {component}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -713,7 +773,7 @@ const filteredData = data.filter((row) => {
             </th>
 
             <th className="py-2 border border-black w-[25%]">Model</th>
-            <th className="py-2 border border-black w-[5%]">Healthscore</th>
+            <th className="py-2 border border-black w-[6%]">Healthscore</th>
             <th className="py-2 border border-black w-[8%]">Actual value</th>
             <th className="py-2 border border-black w-[5%]">Units</th>
           </tr>
@@ -727,7 +787,7 @@ const filteredData = data.filter((row) => {
                 key={globalIndex}
                 className={`cursor-pointer hover:bg-blue-500 ${
                   isSelected
-                    ? "bg-purple-700 text-white"
+                    ? "bg-fuchsia-600 text-white"
                     : row.Caution === 1
                     ? "bg-caution-1-gradient text-white hover:bg-caution-blue-gradient"
                     : row.Caution === 0.5
@@ -747,14 +807,14 @@ const filteredData = data.filter((row) => {
                 <td className="py-2 border text-base ">
                   <div className="flex items-center space-x-2 h-full">
                     <UserGroupIcon
-                      className="w-7 h-7 cursor-pointer rounded-full p-1 bg-indigo-500 text-white ml-3"
+                      className="w-7 h-7 cursor-pointer rounded-full p-1 bg-indigo-600 text-white ml-3"
                       onClick={(e) => {
                         e.stopPropagation();
                         const plant = row.PLANT;
                         const tooltip = roleMap[plant];
                         const htmlContent = (
                           <div className="mt-2 flex flex-col font-kanit">
-                            <div className="flex items-center gap-4 text-lg font-kanit">
+                            <div className="flex items-center gap-2 text-lg font-kanit">
                               <UserIcon className="w-8 h-8 bg-indigo-600 text-white p-1 rounded-full" />
                               <strong className="whitespace-nowrap">
                                 Machine Diagnostic Engineer :
@@ -763,22 +823,22 @@ const filteredData = data.filter((row) => {
                                 className="inline-flex items-center justify-center rounded-full
                                  bg-rose-600 px-6 py-1 text-base font-medium text-white
                                  ring-1 ring-gray-500/10 ring-inset
-                                 max-w-[250px] whitespace-nowrap overflow-hidden text-ellipsis"
+                                 max-w-[350px] whitespace-nowrap overflow-hidden text-ellipsis"
                               >
                                 {tooltip.engineer}
                               </span>
                             </div>
                             <br />
-                                  <div className="flex items-center gap-4 text-lg font-kanit">
+                            <div className="flex items-center gap-2 text-lg font-kanit">
                               <UserIcon className="w-8 h-8 bg-indigo-600 text-white p-1 rounded-full" />
                               <strong className="whitespace-nowrap">
                                 Machine Monitoring Officer :
                               </strong>
                               <span
                                 className="inline-flex items-center justify-center rounded-full
-               bg-rose-500 px-6 py-1 text-base font-medium text-white
-               ring-1 ring-gray-500/10 ring-inset
-               max-w-[220px] whitespace-nowrap overflow-hidden text-ellipsis"
+                                bg-rose-500 px-6 py-1 text-base font-medium text-white
+                              ring-1 ring-gray-500/10 ring-inset
+                              max-w-[300px] whitespace-nowrap overflow-hidden text-ellipsis"
                               >
                                 {tooltip.officer}
                               </span>
@@ -802,7 +862,7 @@ const filteredData = data.filter((row) => {
                         </div>
                        <button id="swalCloseBtn" class="text-white text-2xl font-bold focus:outline-none">&times;</button>
                          </div>
-                                 <div class="p-4 bg-pink-200 text-black">
+                                 <div class="px-5 py-8 bg-pink-200 text-black ">
                                         ${htmlString}
                                   </div>
                          </div>
@@ -814,7 +874,7 @@ const filteredData = data.filter((row) => {
                           color: "#ffffff",
                           timer: null,
                           customClass: {
-                            popup: "shadow-none p-0 max-w-xl w-full",
+                            popup: "shadow-none p-0 max-w-xl w-full ",
                           },
                           didOpen: () => {
                             // ผูก event ให้ปุ่ม Close ที่เราสร้างเอง
@@ -856,7 +916,7 @@ const filteredData = data.filter((row) => {
                       row.Note.trim().toLowerCase() !== "undefined" && (
                         <Badge color="secondary" badgeContent={0}>
                           <EnvelopeIcon
-                            className="w-6 h-6 cursor-pointer text-teal-500"
+                            className="w-6 h-6 cursor-pointer text-green-500"
                             onClick={(e) => {
                               e.stopPropagation();
                               const acknowledge = row.Acknowledge || "N/A";
@@ -864,19 +924,22 @@ const filteredData = data.filter((row) => {
                               const htmlContent = (
                                 <div className="mt-2 w-max font-kanit">
                                   <p className="flex items-center gap-2 break-words whitespace-pre-wrap">
-                                    <CalendarIcon className="w-8 h-8 inline-block" />
+                                    <CalendarIcon className="w-7 h-7 inline-block" />
                                     <strong>
                                       Acknowledge Time :
-                                      <span className="inline-flex items-center  px-2 py-1 text-lg font-bold text-red-600  my-2 mx-2">
+                                      <span
+                                        className="inline-flex items-center  px-2 py-1 text-lg font-bold
+                                       text-rose-600  my-2 mx-2"
+                                      >
                                         {acknowledge}
                                       </span>
                                     </strong>
                                   </p>
 
                                   <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1 ">
-                                    <ChatBubbleLeftEllipsisIcon className="w-8 h-8 inline-block " />
+                                    <ChatBubbleLeftEllipsisIcon className="w-7 h-7 inline-block " />
                                     <strong> Note: </strong>
-                                    <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-500 px-3 py-1 text-lg font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
+                                    <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-600 px-3 py-1 text-lg font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
                                       {noteText}
                                     </span>
                                   </p>
@@ -964,7 +1027,6 @@ const filteredData = data.filter((row) => {
           }
             animate__faster`}
           >
-            
             <div className="bg-modal-gradient w-full rounded-xl px-4 py-3">
               <h3 className="text-xl font-semibold text-white">
                 Edit Caution Row
@@ -1056,14 +1118,13 @@ const filteredData = data.filter((row) => {
                 borderRadius: "100%",
                 fontWeight: "bold",
                 fontSize: "16px",
-               
                 // เพิ่มพื้นที่ให้กับปุ่ม
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af", // สีข้อความตอนถูกเลือก
                 backgroundColor: "white", // สีพื้นหลังตอนถูกเลือก
-                border: "2px solid #1e40af", // ขอบสีตอนเลือก
-                fontWeight: "bold", // ความหนาของข้อความตอนเลือก
+                border: "2px solid #1e40af",
+                fontWeight: "bold",
               },
               "& .MuiPaginationItem-root:hover": {
                 backgroundColor: "#2563eb", // สีพื้นหลังตอน hover
@@ -1072,7 +1133,6 @@ const filteredData = data.filter((row) => {
               },
               "& .MuiPagination-ul": {
                 padding: "10px", // เพิ่มพื้นที่รอบๆ Pagination
-              
               },
             }}
             color="primary" // อันนี้จะยังมีผลอยู่แต่ถ้า override สีด้วย sx จะมีน้ำหนักมากกว่า
