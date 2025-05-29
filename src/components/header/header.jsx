@@ -1,6 +1,7 @@
 import logoImage from '../../assets/Thesoothsayer.png'; // นำเข้าโลโก้
 import SearchBar from '../search/search';
 
+
 function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
   // สร้าง autocomplete suggestions จาก data
   const allKeywords = [
@@ -22,7 +23,7 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
     : [];
 
  return (
-  <div className="px-6 py-4">
+  <div className="px-6 ">
     {/* logo อยู่บรรทัดแรก */}
      <div className="flex justify-center items-center h-auto">
       <img
@@ -36,12 +37,15 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
 
     {/* searchbar อยู่บรรทัดถัดมา */}
     <div className="relative w-full max-w-md mt-10">
-      <SearchBar
+      <span>
+         <SearchBar
         className="w-full"
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         suggestions={suggestions}
       />
+      </span>
+     
     </div>
   </div>
 );

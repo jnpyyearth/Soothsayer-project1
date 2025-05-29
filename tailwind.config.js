@@ -16,13 +16,13 @@ export default {
       // ใช้ gradient แบบกำหนดเอง
       backgroundImage: {
         "form-modal-gradient": 
-          "linear-gradient(0deg,rgba(103, 0, 247, 1) 27%, rgba(0, 8, 255, 1) 100%)",
+          "linear-gradient(0deg,#6700f7 27%, rgba(0, 8, 255, 1) 100%)",
         "modal-gradient":
           "linear-gradient(90deg,rgba(105, 18, 102, 1) 0%, rgba(219, 0, 80, 1) 50%, rgba(194, 55, 196, 1) 100%)",
         "headtable-gradient":
-          "linear-gradient(0deg,rgba(77, 13, 166, 1) 27%, rgba(31, 43, 209, 1) 100%)",
+          "linear-gradient(0deg,rgba(0, 89, 255, 1) 0%, rgba(0, 25, 99, 1) 100%)",
         "caution-1-gradient":
-          "linear-gradient(to top,oklch(50.5% 0.213 27.518),oklch(51.4% 0.222 16.935),oklch(58.6% 0.253 17.585))",
+          "linear-gradient(to top,oklch(51.4% 0.222 16.935),oklch(63.7% 0.237 25.331))",
         "caution-0.5-gradient":
           "linear-gradient(to bottom ,oklch(85.2% 0.199 91.936),oklch(90.5% 0.182 98.111))",
         "caution-blue-gradient": "linear-gradient(to top, #3b82f6, #60a5fa)",
@@ -33,8 +33,16 @@ export default {
         white: "ffffff",
       },
       colors: {
-        "hover-blue": "#3b82f6"
-        ,
+        "hover-blue": "#3b82f6",
+        "head-column":"#142850",
+        "caution-1" : "#BF3131",
+        "caution-0" : "#ECDFCC",
+        "border":"2E5077",
+      },
+      fontsize:{
+         sm:['12px','16px'],
+         base:['16px','24px'],
+         lg:['20px','28px'],
       },
       
       keyframes: {
@@ -72,4 +80,3 @@ export default {
     }),
   ],
 };
-

@@ -448,9 +448,9 @@ const filteredData = data.filter((row) => {
       </div>
 
       <table className="w-full table-auto  text-sm mt-6 overflow-visible">
-        <thead className="bg-headtable-gradient text-lg text-white ">
+        <thead className="bg-head-column text-lg text-white ">
           <tr>
-            <th className="border  border-black  text-base w-[15%] px-1 py-3">
+            <th className="border  border-cyan-950  text-base w-[2%] px-1 py-3">
               {/* Time dropdown */}
               <div className="inline-flex space-x-2 items-center">
                 {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
@@ -461,9 +461,9 @@ const filteredData = data.filter((row) => {
                   <button
                     type="button"
                     className="hs-dropdown-toggle w-max px-3 py-2
-                     inline-flex items-center gap-x-2 text-base 
+                     inline-flex items-center gap-x-2 text-lg 
                        rounded-lg border-2 border-sky-300
-                      bg-indigo-900 text-white shadow-2xs focus:outline-hidden"
+                      bg-cyan-950 text-white shadow-2xs focus:outline-hidden"
                     aria-haspopup="menu"
                     aria-expanded={open ? "true" : "false"}
                     aria-label="Dropdown"
@@ -542,21 +542,21 @@ const filteredData = data.filter((row) => {
                     setCurrentPage(1);
                     setSelectedRowGlobalIndex(null);
                   }}
-                  className="px-3 py-2 rounded-lg border-2 border-sky-300 bg-indigo-900 text-white
-                  shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer"
+                  className="px-3 py-2 rounded-lg border-2 border-sky-300 bg-cyan-950 text-white
+                  shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer text-lg"
                   aria-label="Select Date"
                 />
               </div>
             </th>
 
             {/* Plant dropdown */}
-            <th className="border border-black w-[10%]">
+            <th className="border border-cyan-950   w-[2%]">
               <div className="relative inline-flex" ref={plantDropdownRef}>
                 <button
                   type="button"
                   className="hs-dropdown-toggle py-2 px-5 inline-flex 
-                  items-center text-base font-medium w-[200] rounded-lg 
-                  border border-sky-500 bg-slate-300 text-slate-800 shadow-white 
+                  items-center text-lg font-medium w-[200] rounded-lg 
+                  border border-sky-500 bg-cyan-950 text-white  shadow-white 
                   focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={plantDropdownOpen ? "true" : "false"}
@@ -608,7 +608,7 @@ const filteredData = data.filter((row) => {
                           key={plant}
                           onClick={() => handleSelectPlant(plant)}
                           className="block w-full px-2 py-2 
-                          text-base  whitespace-nowrap text-green-200
+                          text-base  whitespace-nowrap text-blue-200
                            dark:hover:bg-neutral-700 text-center"
                         >
                           {plant}
@@ -621,12 +621,12 @@ const filteredData = data.filter((row) => {
             </th>
 
             {/* Machine dropdown */}
-            <th className=" py-2  border border-black w-[11%]">
+            <th className=" py-2  border border-cyan-950   w-[4%]">
               <div className="relative inline-flex" ref={machineRef}>
                 <button
                   type="button"
                   className="hs-dropdown-toggle py-2 px-2 inline-flex 
-                  items-center gap-x-2 text-base font-medium rounded-lg border-2 border-sky-300 bg-indigo-900 text-white shadow-2xs focus:outline-hidden "
+                  items-center gap-x-2 text-lg font-medium rounded-lg border-2 border-sky-300 bg-cyan-950 text-white shadow-2xs focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={machineOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -686,7 +686,7 @@ const filteredData = data.filter((row) => {
                             <button
                               key={machine}
                               onClick={() => handleSelectmachine(machine)}
-                              className="block w-full text-left px-4 py-2 text-base text-amber-300 whitespace-nowrap
+                              className="block w-full text-left px-4 py-2 text-base text-blue-200 whitespace-nowrap
                            hover:bg-blue-100  dark:hover:bg-neutral-700"
                             >
                               {machine}
@@ -701,12 +701,12 @@ const filteredData = data.filter((row) => {
             </th>
 
             {/* Components dropdown */}
-            <th className=" py-2 border border-black w-[10%]">
+            <th className=" py-2 border border-cyan-950  w-[3%]">
               <div className="relative inline-flex" ref={componentsRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-base
-                  font-medium rounded-lg border border-sky-500 bg-slate-300 text-slate-800 shadow-2xs  focus:outline-hidden"
+                  className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-lg
+                  font-medium rounded-lg border border-sky-500 bg-cyan-950 text-white  shadow-2xs  focus:outline-hidden"
                   aria-haspopup="menu"
                   aria-expanded={componentsOpen ? "true" : "false"}
                   aria-label="Dropdown"
@@ -768,7 +768,7 @@ const filteredData = data.filter((row) => {
                             <button
                               key={component}
                               onClick={() => handleSelectcomponent(component)}
-                              className="block w-full text-left px-4 py-2 text-base text-amber-200 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
+                              className="block w-full text-left px-4 py-2 text-base text-blue-200 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
                             >
                               {component}
                             </button>
@@ -781,10 +781,10 @@ const filteredData = data.filter((row) => {
               </div>
             </th>
 
-            <th className="py-2 border border-black w-[25%]">Model</th>
-            <th className="py-2 border border-black w-[6%]">Healthscore</th>
-            <th className="py-2 border border-black w-[8%]">Actual value</th>
-            <th className="py-2 border border-black w-[5%]">Units</th>
+            <th className="py-2 border border-cyan-950   w-[2%]">Model</th>
+            <th className="py-2 border border-cyan-950   w-[1%]">Healthscore</th>
+            <th className="py-2 border border-cyan-950   w-[1%]">Actual value</th>
+            <th className="py-2 border border-cyan-950   w-[1%]">Units</th>
           </tr>
         </thead>
         <tbody>
@@ -796,12 +796,12 @@ const filteredData = data.filter((row) => {
                 key={globalIndex}
                 className={`cursor-pointer transition duration-300 ease-in-out ${
                   isSelected
-                    ? "bg-green-500 text-white"
+                    ? "bg-green-600 text-white "
                     : row.Caution === 1
-                    ? "bg-caution-1-gradient text-white hover:bg-caution-blue-gradient"
+                    ? "bg-caution-1 text-white hover:bg-caution-blue-gradient text-lg font-medium font-kanit"
                     : row.Caution === 0.5
-                    ? "bg-yellow-400 text-black hover:bg-caution-blue-gradient "
-                    : "bg-normal-gradient marker: text-black hover:bg-caution-blue-gradient"
+                    ? "bg-yellow-500 text-black hover:bg-caution-blue-gradient text-lg font-medium "
+                    : "bg-caution-0 marker: text-black hover:bg-caution-blue-gradient font-light text-base"
                 }`}
                 onClick={() => setSelectedRowGlobalIndex(globalIndex)}
                 // เลือกแถว + เปิด modal edit ทันที
@@ -811,13 +811,12 @@ const filteredData = data.filter((row) => {
                 }}
               >
                 {/* time row detail */}
-                <td className="py-2 border text-lg">{row.TIME}</td>
+                <td className="py-2 border-2 border-cyan-950 text-lg ">{row.TIME}</td>
                 {/* plant row detail */}
-                <td className="py-2 border text-lg ">
-                  <div className="flex items-center space-x-2 h-full  justify-center">
+                <td className="py-2 border-2 border-cyan-950  text-lg ">
+                  <div className="flex items-center space-x-2 h-full justify-center">
                     <UserGroupIcon
-                      className="w-7 h-7 cursor-pointer rounded-full p-1 bg-indigo-600 
-                      text-white ml-3 items-start justify-start"
+                      className="w-7 h-7 cursor-pointer rounded-full p-1 bg-blue-600 text-white ml-3"
                       onClick={(e) => {
                         e.stopPropagation();
                         const plant = row.PLANT;
@@ -826,7 +825,7 @@ const filteredData = data.filter((row) => {
                           <div className="mt-2 flex flex-col font-kanit">
                             <div className="flex items-center gap-2 text-lg font-kanit">
                               <WrenchScrewdriverIcon
-                                className="w-9 h-9 bg-indigo-700 
+                                className="w-9 h-9 bg-blue-600
                               text-white p-1 rounded-full"
                               />
                               <strong className="whitespace-nowrap">
@@ -834,7 +833,7 @@ const filteredData = data.filter((row) => {
                               </strong>
                               <span
                                 className="inline-flex items-center justify-center rounded-full
-                                 bg-rose-600 px-4 py-1 text-base font-medium text-white
+                                 bg-rose-700 px-4 py-1 text-base font-medium text-white
                                  ring-1 ring-gray-500/10 ring-inset
                                  max-w-[350px] whitespace-nowrap overflow-hidden text-ellipsis"
                               >
@@ -843,13 +842,13 @@ const filteredData = data.filter((row) => {
                             </div>
                             <br />
                             <div className="flex items-center gap-2 text-lg font-kanit">
-                              <ComputerDesktopIcon className="w-9 h-9 bg-indigo-700 text-white p-1 rounded-full" />
+                              <ComputerDesktopIcon className="w-9 h-9 bg-blue-600 text-white p-1 rounded-full" />
                               <strong className="whitespace-nowrap">
                                 Machine Monitoring Officer :
                               </strong>
                               <span
                                 className="inline-flex items-center justify-center rounded-full
-                                bg-rose-500 px-4 py-1 text-base font-medium text-white
+                                bg-rose-600 px-4 py-1 text-base font-medium text-white
                               ring-1 ring-gray-500/10 ring-inset
                               max-w-[300px] whitespace-nowrap overflow-hidden text-ellipsis"
                               >
@@ -916,9 +915,9 @@ const filteredData = data.filter((row) => {
                     <span>{row.PLANT || "-"}</span>
                   </div>
                 </td>
-                <td className="py-2 border text-lg">{row.MACHINE}</td>
-                <td className="py-2 border text-base">{row.COMPONENT}</td>
-                <td className=" border text-center whitespace-normal ">
+                <td className="py-2 border text-lg border-cyan-950">{row.MACHINE}</td>
+                <td className="py-2 border text-base border-cyan-950">{row.COMPONENT}</td>
+                <td className=" border text-center whitespace-normal border-cyan-950 ">
                   <span className="flex items-center space-x-2 w-auto">
                     <span className="text-base py-2 mx-2 truncate break-words">
                       {row.MODEL}
@@ -929,7 +928,7 @@ const filteredData = data.filter((row) => {
                       row.Note.trim().toLowerCase() !== "undefined" && (
                         <Badge color="secondary" badgeContent={0}>
                           <EnvelopeIcon
-                            className="w-6 h-6 cursor-pointer text-indigo-700"
+                            className="w-6 h-6 cursor-pointer text-green-900"
                             onClick={(e) => {
                               e.stopPropagation();
                               const acknowledge = row.Acknowledge || "N/A";
@@ -942,7 +941,7 @@ const filteredData = data.filter((row) => {
                                       Acknowledge Time :
                                       <span
                                         className="inline-flex items-center  px-2 py-1 text-lg font-bold
-                                       text-rose-600  my-2 mx-2"
+                                       text-rose-700  my-2 mx-2"
                                       >
                                         {acknowledge}
                                       </span>
@@ -952,7 +951,7 @@ const filteredData = data.filter((row) => {
                                   <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1 ">
                                     <ChatBubbleLeftEllipsisIcon className="w-7 h-7 inline-block " />
                                     <strong> Note: </strong>
-                                    <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-600 px-3 py-1 text-lg font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
+                                    <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
                                       {noteText}
                                     </span>
                                   </p>
@@ -1019,9 +1018,9 @@ const filteredData = data.filter((row) => {
                   </span>
                 </td>
 
-                <td className="py-2 border text-base">{row.HEALTHSCORE}</td>
-                <td className="py-2 border text-base">{row.Actual_Value}</td>
-                <td className="py-2 border text-base">{row.UNITS}</td>
+                <td className="py-2 border text-base border-cyan-950 ">{row.HEALTHSCORE}</td>
+                <td className="py-2 border text-base border-cyan-950">{row.Actual_Value}</td>
+                <td className="py-2 border text-base border-cyan-950">{row.UNITS}</td>
               </tr>
             );
           })}
@@ -1130,10 +1129,10 @@ const filteredData = data.filter((row) => {
                 backgroundColor: "#1e40af",
                 borderRadius: "100%",
                 fontWeight: "bold",
-                fontSize: "20px", // ปรับขนาดตัวอักษรให้ใหญ่ขึ้น
-                padding: "10px", // เพิ่ม padding ให้ปุ่มใหญ่ขึ้น
-                width: "40px", // กำหนดความกว้างให้ปุ่ม
-                height: "40px", // กำหนดความสูงให้ปุ่ม
+                fontSize: "22px", // ปรับขนาดตัวอักษรให้ใหญ่ขึ้น
+                padding: "2px", // เพิ่ม padding ให้ปุ่มใหญ่ขึ้น
+                width: "45px", // กำหนดความกว้างให้ปุ่ม
+                height: "45px", // กำหนดความสูงให้ปุ่ม
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af", // สีข้อความตอนถูกเลือก
