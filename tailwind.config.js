@@ -36,7 +36,7 @@ export default {
         "hover-blue": "#3b82f6",
         "head-column":"#142850",
         "caution-1" : "#BF3131",
-        "caution-0" : "#ECDFCC",
+        "caution-0" : "#F6F4F0",
         "border":"2E5077",
       },
       fontsize:{

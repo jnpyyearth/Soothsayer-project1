@@ -27,7 +27,8 @@ function SearchBar({ searchTerm, setSearchTerm }) {
   };
 
   return (
-    <div className="relative w-[550px] mt-5">
+    <span>
+        <div className="relative w-[550px] mt-5">
       <MagnifyingGlassIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-indigo-800" />
       <input
         type="text"
@@ -40,6 +41,13 @@ function SearchBar({ searchTerm, setSearchTerm }) {
         onKeyDown={handleKeyDown}
       />
     </div>
+
+    <button classname ="bg-orange-700 text-zinc-50 rounded-full mt-4 px-4 ">
+      RESET
+    </button>
+
+    </span>
+  
   );
 }
 
