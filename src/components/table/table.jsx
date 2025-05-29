@@ -813,10 +813,11 @@ const filteredData = data.filter((row) => {
                 {/* time row detail */}
                 <td className="py-2 border text-lg">{row.TIME}</td>
                 {/* plant row detail */}
-                <td className="py-2 border text-base ">
-                  <div className="flex items-center space-x-2 h-full">
+                <td className="py-2 border text-lg ">
+                  <div className="flex items-center space-x-2 h-full  justify-center">
                     <UserGroupIcon
-                      className="w-7 h-7 cursor-pointer rounded-full p-1 bg-indigo-600 text-white ml-3"
+                      className="w-7 h-7 cursor-pointer rounded-full p-1 bg-indigo-600 
+                      text-white ml-3 items-start justify-start"
                       onClick={(e) => {
                         e.stopPropagation();
                         const plant = row.PLANT;

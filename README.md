@@ -21,11 +21,18 @@ How to run frontend(React-vite) server ?
  > npm run dev  
 
 Howto run backend(Python)server
+
+first intall flask cors (if you downloaded zip file / clone project)
+> npm install
+> cd backend
+> pip install flask-cors
+
+next>> run python script activate 
 ** pls check if the environtment in "venv" is correct 
    how to set environtment in venv(create virtual environtment)
   > python -m venv venv
   > .\venv\Scripts\activate
   > pip install -r requirements.txt
 
-run server
+run server backend
   > python app.py (flask api)
