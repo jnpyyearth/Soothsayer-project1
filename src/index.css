@@ -16,12 +16,12 @@ background: #0B192C;
   -moz-osx-font-smoothing: grayscale;
 }
 
+
 body {
   margin: 0;
   display: flex;
   min-width: 320px;
   min-height: 100vh;
-  
   flex-direction: column; /* กำหนดให้ child เรียงแนวตั้ง */
   overflow-x: hidden; /* ซ่อน scrollbar แนวนอน */
   /* overflow-y: hidden; */

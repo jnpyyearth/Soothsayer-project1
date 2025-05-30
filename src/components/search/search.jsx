@@ -24,30 +24,30 @@ function SearchBar({ searchTerm, setSearchTerm }) {
       if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
       setSearchTerm(inputValue.trim());
     }
+   
   };
 
   return (
-    <span>
-        <div className="relative w-[550px] mt-5">
-      <MagnifyingGlassIcon className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-indigo-800" />
-      <input
-        type="text"
-        className="w-full py-2 pl-10 rounded-lg border border-gray-700 bg-sky-100
-      font-kanit text-indigo-800 text-lg
-      shadow-sm focus:outline-none focus:ring-2 focus:ring-neutral-200 placeholder:text-indigo-300 "
-        placeholder="Search"
-        value={inputValue}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-      />
-    </div>
-
-    <button classname ="bg-orange-700 text-zinc-50 rounded-full mt-4 px-4 ">
-      RESET
-    </button>
-
-    </span>
-  
+   <span >
+  <div className="relative w-[550px] mt-5 ">
+    <MagnifyingGlassIcon 
+      className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-indigo-800" 
+    />
+    <input
+      type="text"
+      className="
+        w-full py-2 pl-10 rounded-lg border border-gray-700 bg-sky-100
+        font-kanit text-indigo-800 text-lg shadow-sm
+        focus:outline-none focus:ring-2 focus:ring-neutral-200
+        placeholder:text-indigo-300
+      "
+      placeholder="Search"
+      value={inputValue}
+      onChange={handleChange}
+      onKeyDown={handleKeyDown}
+    />
+  </div>
+</span>
   );
 }
 

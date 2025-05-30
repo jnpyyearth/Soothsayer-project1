@@ -1,5 +1,6 @@
 import logoImage from '../../assets/Thesoothsayer.png'; // นำเข้าโลโก้
 import SearchBar from '../search/search';
+import Clearall from '../clear-all/clearall';
 
 
 function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
@@ -22,6 +23,10 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
       )
     : [];
 
+          const reloadPage = () => {
+    window.location.reload();
+  };
+
  return (
   <div className="px-6 ">
     {/* logo อยู่บรรทัดแรก */}
@@ -36,14 +41,16 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
     </div>
 
     {/* searchbar อยู่บรรทัดถัดมา */}
-    <div className="relative w-full max-w-md mt-10">
-      <span>
+    <div className="relative w-full max-w-md mt-10 ">
+      <span className= "flex flex-col-2">
          <SearchBar
         className="w-full"
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         suggestions={suggestions}
       />
+
+       <Clearall onReload={reloadPage}/>
       </span>
      
     </div>

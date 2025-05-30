@@ -58,6 +58,10 @@ function Table() {
       setIsClosing(false);
     }, 300);
   };
+
+      const reloadPage = () => {
+    window.location.reload();
+  };
   
   //array data engineer & officer
   const roleMap = {
@@ -435,17 +439,19 @@ const filteredData = data.filter((row) => {
       style={{ tableLayout: "fixed" }}
     >
       <div
-        className="md:w-auto flex-col md:flex-row space-y-2 
+        className="md:w-auto flex-col md:flex-row flex-grow space-y-2 
       md:space-y-0 z-100 align-top"
       >
         <Header
           onLogoClick={handleLogoClick}
+          onReload={reloadPage}
           data={data}
           searchTerm={searchTerm}
           setSearchTerm={handleSearchTermChange}
           className="relative"
         />
       </div>
+
 
       <table className="w-full table-auto  text-sm mt-6 overflow-visible">
         <thead className="bg-head-column text-lg text-white ">
@@ -787,6 +793,8 @@ const filteredData = data.filter((row) => {
             <th className="py-2 border border-cyan-950   w-[1%]">Units</th>
           </tr>
         </thead>
+
+        {/* data in row */}
         <tbody>
           {paginatedData.map((row, index) => {
             const globalIndex = (currentPage - 1) * pageSize + index;
@@ -927,8 +935,9 @@ const filteredData = data.filter((row) => {
                       row.Note.trim().toLowerCase() !== "null" &&
                       row.Note.trim().toLowerCase() !== "undefined" && (
                         <Badge color="secondary" badgeContent={0}>
+                          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75"></span>
                           <EnvelopeIcon
-                            className="w-6 h-6 cursor-pointer text-green-900"
+                            className="w-6 h-6 cursor-pointer text-green-900 animate-fadeInSlideIn"
                             onClick={(e) => {
                               e.stopPropagation();
                               const acknowledge = row.Acknowledge || "N/A";
@@ -1033,13 +1042,13 @@ const filteredData = data.filter((row) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           {/* bg modal form */}
           <div
-            className={`bg-sky-200 text-black p-4 rounded-lg shadow-lg w-[90%] max-w-md 
+            className={`bg-pink-200 text-black p-4 rounded-lg shadow-lg w-[90%] max-w-md 
           animate__animated animate__fadeInUp animate__faster  ${
             isClosing ? "animate__fadeOut" : "animate__fadeInUp"
           }
             animate__faster`}
           >
-            <div className="bg-form-modal-gradient w-full rounded-xl px-4 py-3">
+            <div className="bg-modal-gradient w-full rounded-xl px-4 py-3">
               <h3 className="text-xl font-semibold text-white">
                 Edit Caution Row
               </h3>
