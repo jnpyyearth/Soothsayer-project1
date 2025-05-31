@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import {UserGroupIcon,CalendarIcon,UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,
-  EnvelopeIcon,WrenchScrewdriverIcon,ComputerDesktopIcon} from "@heroicons/react/24/solid";
+  EnvelopeIcon,WrenchScrewdriverIcon,ComputerDesktopIcon,CogIcon,BuildingOffice2Icon,ClockIcon} from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
 import Badge from "@mui/material/Badge";
 import Pagination from "@mui/material/Pagination";
+import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import Stack from "@mui/material/Stack";
 import ReactDOMServer from "react-dom/server";
 import {FormControl,FormLabel,RadioGroup,FormControlLabel,Radio,} from '@mui/material';
@@ -323,6 +324,8 @@ const filteredData = data.filter((row) => {
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
+
+  
  
   //กำหนดการคลิกlogo แล้วฟอร์ม
   const handleLogoClick = () => {
@@ -474,7 +477,7 @@ const filteredData = data.filter((row) => {
                     aria-expanded={open ? "true" : "false"}
                     aria-label="Dropdown"
                     onClick={() => setOpen(!open)}
-                  >
+                  >  
                     {selectedTime}
                     <svg
                       className={`size-4 transition-transform ${
@@ -561,15 +564,17 @@ const filteredData = data.filter((row) => {
                 <button
                   type="button"
                   className="hs-dropdown-toggle py-2 px-5 inline-flex 
-                  items-center text-lg font-medium w-[200] rounded-lg 
+                  items-center text-lg font-medium w-[200] rounded-lg gap-x-2 
                   border border-sky-500 bg-cyan-950 text-white  shadow-white 
                   focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={plantDropdownOpen ? "true" : "false"}
                   aria-label="Dropdown"
                   onClick={() => setPlantDropdownOpen(!plantDropdownOpen)}
-                >
+                > 
+                  <BuildingOffice2Icon className="h-7 w-7 text-lime-300"/>
                   {selectedPlant}
+                 
                   <svg
                     className={`size-4 transition-transform ml-1 ${
                       plantDropdownOpen ? "rotate-180" : ""
@@ -631,13 +636,14 @@ const filteredData = data.filter((row) => {
               <div className="relative inline-flex" ref={machineRef}>
                 <button
                   type="button"
-                  className="hs-dropdown-toggle py-2 px-2 inline-flex 
+                  className="hs-dropdown-toggle py-2 px-3 inline-flex 
                   items-center gap-x-2 text-lg font-medium rounded-lg border-2 border-sky-300 bg-cyan-950 text-white shadow-2xs focus:outline-hidden "
                   aria-haspopup="menu"
                   aria-expanded={machineOpen ? "true" : "false"}
                   aria-label="Dropdown"
                   onClick={() => setmachineopen(!machineOpen)}
-                >
+                > 
+                  <PrecisionManufacturingIcon sx={{ fontSize: 28, color: '#bef264' }} />
                   {selectedmachine}
                   <svg
                     className={`size-4 transition-transform ${
@@ -718,6 +724,7 @@ const filteredData = data.filter((row) => {
                   aria-label="Dropdown"
                   onClick={() => setComponentopen(!componentsOpen)}
                 >
+                   <CogIcon className="h-8 w-8  text-lime-300 "/>
                   {selectedcomponents}
                   <svg
                     className={`size-4 transition-transform ${
