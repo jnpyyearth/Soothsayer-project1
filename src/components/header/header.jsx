@@ -41,7 +41,7 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
     </div>
 
     {/* searchbar อยู่บรรทัดถัดมา */}
-    <div className="relative w-full max-w-md mt-10 ">
+    <div className="relative w-full max-w-md">
       <span className= "flex flex-col-2">
          <SearchBar
         className="w-full"

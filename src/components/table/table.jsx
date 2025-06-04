@@ -50,6 +50,8 @@ function Table() {
   const [isClosing, setIsClosing] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const pageSize = 25; //กำหนดให้แสดง 25 แถว
+  const [selectedRowKey, setSelectedRowKey] = useState(null);
+
 
   //ปิด modal ใน 3 วิ
   const closeModalWithFade = () => {
@@ -157,12 +159,16 @@ function Table() {
   }, [selectedmachine, selectedPlant, data]);
 
   //fetch api
-  const fetchData = () => {
-    fetch("/get_data")
-      .then((res) => res.json())
-      .then((json) => setData(json))
-      .catch((err) => console.error(err));
-  };
+const fetchData = () => {
+  fetch("/get_data")
+    .then((res) => res.json())
+    .then((json) => {
+      console.log("Fetched data: ", json);  // ตรวจสอบข้อมูลที่ได้จาก API
+      setData(json);  // อัปเดต state 'data' กับข้อมูลใหม่
+    })
+    .catch((err) => console.error("Error fetching data:", err));  // ตรวจสอบ error ในการดึงข้อมูล
+};
+
 
   useEffect(() => {fetchData();}, []);
  
@@ -325,8 +331,6 @@ const filteredData = data.filter((row) => {
     currentPage * pageSize
   );
 
-  
- 
   //กำหนดการคลิกlogo แล้วฟอร์ม
   const handleLogoClick = () => {
     if (selectedRowGlobalIndex !== null) {
@@ -353,46 +357,80 @@ const filteredData = data.filter((row) => {
     }
   };
   
-  //save ข้อมูล caution model ใหม่ และ Post ไปที่ API 
-  const handleSave = () => {
-    let newCaution =
-      action === "custom" ? parseFloat(customCaution) : parseFloat(action);
-    if (isNaN(newCaution)) {
-      Swal.fire(
-        "Invalid Input",
-        "Please enter a valid custom value.",
-        "warning"
-      );
-      return;
-    }
 
-    fetch("http://localhost:5000/update_row", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        rowIndex: selectedRowGlobalIndex,
-        newCaution,
-        note,
-      }),
+
+
+  //save ข้อมูล caution model ใหม่ และ Post ไปที่ API 
+const handleSave = () => {
+  let newCaution =
+    action === "custom" ? parseFloat(customCaution) : parseFloat(action);
+
+  if (isNaN(newCaution)) {
+    Swal.fire("Invalid Input", "Please enter a valid custom value.", "warning");
+    return;
+  }
+
+  fetch("http://localhost:5000/update_row", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      rowIndex: selectedRowGlobalIndex,
+      newCaution,
+      note,
+    }),
+  })
+    .then((res) => res.json())
+    .then((result) => {
+      if (result.status === "success") {
+        // ✅ อัปเดตข้อมูลเฉพาะแถวที่ตรง key
+        setData((prevData) => {
+          const newData = [...prevData];
+          const rowIndex = newData.findIndex(
+            (r) => getRowKey(r) === selectedRowKey
+          );
+          if (rowIndex !== -1) {
+            newData[rowIndex] = {
+              ...newData[rowIndex],
+              Caution: newCaution,
+              Note: note,
+              Acknowledge: result.acknowledge_time,
+            };
+          }
+          return newData;
+        });
+
+        Swal.fire({
+          title: "Saved",
+          text: `Updated at: ${result.acknowledge_time}`,
+          icon: "success",
+          confirmButtonText: "Save",
+          buttonsStyling: false,
+          customClass: {
+            confirmButton:
+              "bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2 rounded",
+            popup: "font-kanit",
+          },
+        }).then(() => {
+          setShowModal(false);
+          setSelectedRowGlobalIndex(null);
+        });
+      } else {
+        Swal.fire("Error", result.message, "error");
+      }
     })
-      .then((res) => res.json())
-      .then((result) => {
-        if (result.status === "success") {
-          Swal.fire(
-            "Saved",
-            `Updated at: ${result.acknowledge_time}`,
-            "success"
-          ).then(() => {
-            fetchData();
-            setShowModal(false);
-            setSelectedRowGlobalIndex(null);
-          });
-        } else {
-          Swal.fire("Error", result.message, "error");
-        }
-      });
-  };
- 
+    .catch((err) => {
+      console.error("Error details: ", err);
+      Swal.fire("Error", err.message || "Unknown error occurred", "error");
+    });
+};
+
+//คีย์เฉพาะของแถว เช่น TIME + PLANT + MACHINE + COMPONENT
+const getRowKey = (row) =>
+  `${row.TIME}||${row.PLANT}||${row.MACHINE}||${row.COMPONENT}`;
+
+
+
+
   //สร้าง html icon ที่จะเรียกใช้แสดงใน swal.fire 
   const iconHtml = ReactDOMServer.renderToStaticMarkup(
     <UserGroupIcon className="inline-block w-5 h-5 mr-2 text-white" />
@@ -438,12 +476,12 @@ const filteredData = data.filter((row) => {
 
   return (
     <div
-      className="p-8 flex flex-col mx-auto font-kanit  "
+      className="p-8 flex flex-col mx-auto font-kanit "
       style={{ tableLayout: "fixed" }}
     >
       <div
-        className="md:w-auto flex-col md:flex-row flex-grow space-y-2 
-      md:space-y-0 z-100 align-top"
+        className="md:w-auto flex-col md:flex-row flex-grow  
+      md:space-y-0 z-100 align-top h-full w-full "
       >
         <Header
           onLogoClick={handleLogoClick}
@@ -455,33 +493,132 @@ const filteredData = data.filter((row) => {
         />
       </div>
 
-
-      <table className="w-full table-auto  text-sm mt-6 overflow-visible">
-        <thead className="bg-head-column text-lg text-white ">
-          <tr>
-            <th className="border  border-cyan-950  text-base w-[2%] px-1 py-3">
-              {/* Time dropdown */}
-              <div className="inline-flex space-x-2 items-center">
-                {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
-                <div
-                  className="relative inline-flex max-w-[180px] "
-                  ref={dropdownRef}
-                >
-                  <button
-                    type="button"
-                    className="hs-dropdown-toggle w-max px-3 py-2
+      <div class="h-full">
+        <table
+          className="w-full table-auto text-xs sm:text-sm md:text-base mt-6 overflow-visible md:overflow-x-visible 
+       overflow-x-auto"
+        >
+          <thead className="bg-head-column text-lg text-white ">
+            <tr className="h-10">
+              <th className="min-w-[10rem] py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                {/* Time dropdown */}
+                <div className="inline-flex space-x-2 items-center">
+                  {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
+                  <div
+                    className="relative inline-flex max-w-[180px] "
+                    ref={dropdownRef}
+                  >
+                    <button
+                      type="button"
+                      className="hs-dropdown-toggle w-max px-3 py-2
                      inline-flex items-center gap-x-2 text-lg 
                        rounded-lg border-2 border-sky-300
                       bg-cyan-950 text-white shadow-2xs focus:outline-hidden"
+                      aria-haspopup="menu"
+                      aria-expanded={open ? "true" : "false"}
+                      aria-label="Dropdown"
+                      onClick={() => setOpen(!open)}
+                    >
+                      {selectedTime}
+                      <svg
+                        className={`size-4 transition-transform ${
+                          open ? "rotate-180" : ""
+                        }`}
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="m6 9 6 6 6-6" />
+                      </svg>
+                    </button>
+
+                    {open && (
+                      <div
+                        className="hs-dropdown-menu transition-[opacity,margin] duration 
+                      absolute right-0 z-10 mt-2
+                      rounded-md bg-white shadow-md dark:bg-indigo-950
+                      dark:border dark:border-neutral-700 max-h-60 overflow-auto min-w-[180px]
+                      "
+                        role="menu"
+                        aria-orientation="vertical"
+                        aria-labelledby="hs-dropdown-hover-event"
+                      >
+                        <div className="p-3">
+                          <button
+                            onClick={() => {
+                              handleSelectTime("Select All Time");
+                              setOpen(false);
+                            }}
+                            className="block w-full text-left px-4 py-2 text-base
+                           text-teal-400 whitespace-nowrap 
+                             dark:hover:bg-neutral-600"
+                          >
+                            Select All Time
+                          </button>
+
+                          {timeRanges.map((rangeLabel) => (
+                            <button
+                              key={rangeLabel}
+                              onClick={() => {
+                                handleSelectTime(rangeLabel);
+                                setOpen(false);
+                              }}
+                              className="block w-full text-left px-4 py-2 
+                            text-base font-semibold whitespace-nowrap
+                             hover:bg-blue-100 dark:text-blue-200 dark:hover:bg-neutral-700"
+                            >
+                              {rangeLabel}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="font-kanit text-base"> | </div>
+
+                  {/* ปุ่มเลือกวันที่ */}
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => {
+                      setSelectedDate(e.target.value);
+                      setCurrentPage(1);
+                      setSelectedRowGlobalIndex(null);
+                    }}
+                    className="px-3 py-2 rounded-lg border-2 border-sky-300 bg-cyan-950 text-white
+                  shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer text-lg"
+                    aria-label="Select Date"
+                  />
+                </div>
+              </th>
+
+              {/* Plant dropdown */}
+              <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <div className="relative inline-flex" ref={plantDropdownRef}>
+                  <button
+                    type="button"
+                    className="hs-dropdown-toggle py-2 px-5 inline-flex 
+                  items-center text-lg font-medium w-[200] rounded-lg gap-x-2 
+                  border border-sky-500 bg-cyan-950 text-white  shadow-white 
+                  focus:outline-hidden "
                     aria-haspopup="menu"
-                    aria-expanded={open ? "true" : "false"}
+                    aria-expanded={plantDropdownOpen ? "true" : "false"}
                     aria-label="Dropdown"
-                    onClick={() => setOpen(!open)}
-                  >  
-                    {selectedTime}
+                    onClick={() => setPlantDropdownOpen(!plantDropdownOpen)}
+                  >
+                    <BuildingOffice2Icon className="h-7 w-7 text-lime-300" />
+                    {selectedPlant}
+
                     <svg
-                      className={`size-4 transition-transform ${
-                        open ? "rotate-180" : ""
+                      className={`size-4 transition-transform ml-1 ${
+                        plantDropdownOpen ? "rotate-180" : ""
                       }`}
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -497,388 +634,305 @@ const filteredData = data.filter((row) => {
                     </svg>
                   </button>
 
-                  {open && (
+                  {plantDropdownOpen && (
                     <div
-                      className="hs-dropdown-menu transition-[opacity,margin] duration 
-                      absolute right-0 z-10 mt-2
-                      rounded-md bg-white shadow-md dark:bg-indigo-950
-                      dark:border dark:border-neutral-700 max-h-60 overflow-auto min-w-[180px]
-                      "
+                      className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
+                   left-1/2 transform -translate-x-1/2
+                    z-10 mt-2 min-w-[300px] origin-top-right rounded-md shadow-md
+                     dark:bg-indigo-950
+                    max-h-60 overflow-auto"
                       role="menu"
                       aria-orientation="vertical"
                       aria-labelledby="hs-dropdown-hover-event"
                     >
-                      <div className="p-3">
+                      <div className="p-1 grid grid-cols-2 gap-2 max-h-60 overflow-auto">
                         <button
-                          onClick={() => {
-                            handleSelectTime("Select All Time");
-                            setOpen(false);
-                          }}
-                          className="block w-full text-left px-4 py-2 text-base
-                           text-teal-400 whitespace-nowrap 
-                             dark:hover:bg-neutral-600"
+                          key="all-plants"
+                          onClick={() => handleSelectPlant("All Plants")}
+                          className="block w-full text-center px-2 py-2 text-base
+                          whitespace-nowrap hover:bg-blue-100
+                          text-teal-400 dark:hover:bg-neutral-700"
                         >
-                          Select All Time
+                          All Plants
                         </button>
-
-                        {timeRanges.map((rangeLabel) => (
+                        {plantOptions.map((plant) => (
                           <button
-                            key={rangeLabel}
-                            onClick={() => {
-                              handleSelectTime(rangeLabel);
-                              setOpen(false);
-                            }}
-                            className="block w-full text-left px-4 py-2 
-                            text-base font-semibold whitespace-nowrap
-                             hover:bg-blue-100 dark:text-blue-200 dark:hover:bg-neutral-700"
+                            key={plant}
+                            onClick={() => handleSelectPlant(plant)}
+                            className="block w-full px-2 py-2 
+                          text-base  whitespace-nowrap text-blue-200
+                           dark:hover:bg-neutral-700 text-center"
                           >
-                            {rangeLabel}
+                            {plant}
                           </button>
                         ))}
                       </div>
                     </div>
                   )}
                 </div>
+              </th>
 
-                <div className="font-kanit text-base"> | </div>
-
-                {/* ปุ่มเลือกวันที่ */}
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => {
-                    setSelectedDate(e.target.value);
-                    setCurrentPage(1);
-                    setSelectedRowGlobalIndex(null);
-                  }}
-                  className="px-3 py-2 rounded-lg border-2 border-sky-300 bg-cyan-950 text-white
-                  shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 cursor-pointer text-lg"
-                  aria-label="Select Date"
-                />
-              </div>
-            </th>
-
-            {/* Plant dropdown */}
-            <th className="border border-cyan-950   w-[2%]">
-              <div className="relative inline-flex" ref={plantDropdownRef}>
-                <button
-                  type="button"
-                  className="hs-dropdown-toggle py-2 px-5 inline-flex 
-                  items-center text-lg font-medium w-[200] rounded-lg gap-x-2 
-                  border border-sky-500 bg-cyan-950 text-white  shadow-white 
-                  focus:outline-hidden "
-                  aria-haspopup="menu"
-                  aria-expanded={plantDropdownOpen ? "true" : "false"}
-                  aria-label="Dropdown"
-                  onClick={() => setPlantDropdownOpen(!plantDropdownOpen)}
-                > 
-                  <BuildingOffice2Icon className="h-7 w-7 text-lime-300"/>
-                  {selectedPlant}
-                 
-                  <svg
-                    className={`size-4 transition-transform ml-1 ${
-                      plantDropdownOpen ? "rotate-180" : ""
-                    }`}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
-
-                {plantDropdownOpen && (
-                  <div
-                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
-                   left-1/2 transform -translate-x-1/2
-                    z-10 mt-2 min-w-[300px] origin-top-right rounded-md shadow-md
-                     dark:bg-indigo-950
-                    max-h-60 overflow-auto"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="hs-dropdown-hover-event"
-                  >
-                    <div className="p-1 grid grid-cols-2 gap-2 max-h-60 overflow-auto">
-                      <button
-                        key="all-plants"
-                        onClick={() => handleSelectPlant("All Plants")}
-                        className="block w-full text-center px-2 py-2 text-base
-                          whitespace-nowrap hover:bg-blue-100
-                          text-teal-400 dark:hover:bg-neutral-700"
-                      >
-                        All Plants
-                      </button>
-                      {plantOptions.map((plant) => (
-                        <button
-                          key={plant}
-                          onClick={() => handleSelectPlant(plant)}
-                          className="block w-full px-2 py-2 
-                          text-base  whitespace-nowrap text-blue-200
-                           dark:hover:bg-neutral-700 text-center"
-                        >
-                          {plant}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </th>
-
-            {/* Machine dropdown */}
-            <th className=" py-2  border border-cyan-950   w-[4%]">
-              <div className="relative inline-flex" ref={machineRef}>
-                <button
-                  type="button"
-                  className="hs-dropdown-toggle py-2 px-3 inline-flex 
+              {/* Machine dropdown */}
+              <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <div className="relative inline-flex" ref={machineRef}>
+                  <button
+                    type="button"
+                    className="hs-dropdown-toggle py-2 px-3 inline-flex 
                   items-center gap-x-2 text-lg font-medium rounded-lg border-2 border-sky-300 bg-cyan-950 text-white shadow-2xs focus:outline-hidden "
-                  aria-haspopup="menu"
-                  aria-expanded={machineOpen ? "true" : "false"}
-                  aria-label="Dropdown"
-                  onClick={() => setmachineopen(!machineOpen)}
-                > 
-                  <PrecisionManufacturingIcon sx={{ fontSize: 28, color: '#bef264' }} />
-                  {selectedmachine}
-                  <svg
-                    className={`size-4 transition-transform ${
-                      machineOpen ? "rotate-180" : ""
-                    }`}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    aria-haspopup="menu"
+                    aria-expanded={machineOpen ? "true" : "false"}
+                    aria-label="Dropdown"
+                    onClick={() => setmachineopen(!machineOpen)}
                   >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
+                    <PrecisionManufacturingIcon
+                      sx={{ fontSize: 28, color: "#bef264" }}
+                    />
+                    {selectedmachine}
+                    <svg
+                      className={`size-4 transition-transform ${
+                        machineOpen ? "rotate-180" : ""
+                      }`}
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
 
-                {machineOpen && (
-                  <div
-                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
+                  {machineOpen && (
+                    <div
+                      className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
                      left-1/2 transform -translate-x-1/2 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md
                      dark:bg-indigo-950 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="hs-dropdown-hover-event"
-                  >
-                    <div className="p-1 space-y-1">
-                      <div className="min-w-max">
-                        <div
-                          className="grid gap-1 p-1 max-h-80 overflow-auto"
-                          style={{
-                            gridTemplateColumns: `repeat(${
-                              machineOption.length <= 4 ? 1 : 2
-                            }, 1fr)`, // ถ้ามี 4 หรือ น้อยกว่านั้น ให้แสดง 1 คอลัมน์
-                            // ถ้ามีมากกว่า 4 ตัว ให้แสดง 2 คอลัมน์
-                          }}
-                        >
-                          <button
-                            key="all-machines"
-                            onClick={() =>
-                              handleSelectmachine("Select All Machine")
-                            }
-                            className="block w-full text-left px-4 py-2
-                        text-base text-teal-400 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="hs-dropdown-hover-event"
+                    >
+                      <div className="p-1 space-y-1">
+                        <div className="min-w-max">
+                          <div
+                            className="grid gap-1 p-1 max-h-80 overflow-auto"
+                            style={{
+                              gridTemplateColumns: `repeat(${
+                                machineOption.length <= 4 ? 1 : 2
+                              }, 1fr)`, // ถ้ามี 4 หรือ น้อยกว่านั้น ให้แสดง 1 คอลัมน์
+                              // ถ้ามีมากกว่า 4 ตัว ให้แสดง 2 คอลัมน์
+                            }}
                           >
-                            Select All Machine
-                          </button>
-
-                          {machineOption.map((machine) => (
                             <button
-                              key={machine}
-                              onClick={() => handleSelectmachine(machine)}
-                              className="block w-full text-left px-4 py-2 text-base text-blue-200 whitespace-nowrap
-                           hover:bg-blue-100  dark:hover:bg-neutral-700"
+                              key="all-machines"
+                              onClick={() =>
+                                handleSelectmachine("Select All Machine")
+                              }
+                              className="block w-full text-left px-4 py-2
+                        text-base text-teal-400 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
                             >
-                              {machine}
+                              Select All Machine
                             </button>
-                          ))}
+
+                            {machineOption.map((machine) => (
+                              <button
+                                key={machine}
+                                onClick={() => handleSelectmachine(machine)}
+                                className="block w-full text-left px-4 py-2 text-base text-blue-200 whitespace-nowrap
+                           hover:bg-blue-100  dark:hover:bg-neutral-700"
+                              >
+                                {machine}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </th>
+                  )}
+                </div>
+              </th>
 
-            {/* Components dropdown */}
-            <th className=" py-2 border border-cyan-950  w-[3%]">
-              <div className="relative inline-flex" ref={componentsRef}>
-                <button
-                  type="button"
-                  className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-lg
+              {/* Components dropdown */}
+              <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <div className="relative inline-flex" ref={componentsRef}>
+                  <button
+                    type="button"
+                    className="hs-dropdown-toggle py-2 px-3 inline-flex items-center gap-x-2 text-lg
                   font-medium rounded-lg border border-sky-500 bg-cyan-950 text-white  shadow-2xs  focus:outline-hidden"
-                  aria-haspopup="menu"
-                  aria-expanded={componentsOpen ? "true" : "false"}
-                  aria-label="Dropdown"
-                  onClick={() => setComponentopen(!componentsOpen)}
-                >
-                   <CogIcon className="h-8 w-8  text-lime-300 "/>
-                  {selectedcomponents}
-                  <svg
-                    className={`size-4 transition-transform ${
-                      componentsOpen ? "rotate-180" : ""
-                    }`}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    aria-haspopup="menu"
+                    aria-expanded={componentsOpen ? "true" : "false"}
+                    aria-label="Dropdown"
+                    onClick={() => setComponentopen(!componentsOpen)}
                   >
-                    <path d="m6 9 6 6 6-6" />
-                  </svg>
-                </button>
+                    <CogIcon className="h-8 w-8  text-lime-300 " />
+                    {selectedcomponents}
+                    <svg
+                      className={`size-4 transition-transform ${
+                        componentsOpen ? "rotate-180" : ""
+                      }`}
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m6 9 6 6 6-6" />
+                    </svg>
+                  </button>
 
-                {componentsOpen && (
-                  <div
-                    className="hs-dropdown-menu transition-[opacity,margin] duration absolute z-10 
+                  {componentsOpen && (
+                    <div
+                      className="hs-dropdown-menu transition-[opacity,margin] duration absolute z-10 
                     mt-2 min-w-fit origin-top-center h-auto
              rounded-md bg-white shadow-md dark:bg-indigo-950 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="hs-dropdown-hover-event"
-                    style={{ left: "50%", transform: "translateX(-50%)" }}
-                  >
-                    <div className="p-1 space-y-1 overflow-x-auto">
-                      <div className="min-w-max">
-                        <div
-                          className="grid gap-1 p-1 max-h-80 overflow-auto"
-                          style={{
-                            gridTemplateColumns: `repeat(${
-                              componentsOption.length <= 4 ? 1 : 2
-                            }, 1fr)`, // ถ้ามี 4 หรือ น้อยกว่านั้น ให้แสดง 1 คอลัมน์,
-                            // ถ้ามากกว่า4 ให้แสดง 2 คอลัมน์
-                          }}
-                        >
-                          <button
-                            key="all-components"
-                            onClick={() =>
-                              handleSelectcomponent("All Components")
-                            }
-                            className="block w-full text-left px-4 py-2 text-base
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="hs-dropdown-hover-event"
+                      style={{ left: "50%", transform: "translateX(-50%)" }}
+                    >
+                      <div className="p-1 space-y-1 overflow-x-auto">
+                        <div className="min-w-max">
+                          <div
+                            className="grid gap-1 p-1 max-h-80 overflow-auto"
+                            style={{
+                              gridTemplateColumns: `repeat(${
+                                componentsOption.length <= 4 ? 1 : 2
+                              }, 1fr)`, // ถ้ามี 4 หรือ น้อยกว่านั้น ให้แสดง 1 คอลัมน์,
+                              // ถ้ามากกว่า4 ให้แสดง 2 คอลัมน์
+                            }}
+                          >
+                            <button
+                              key="all-components"
+                              onClick={() =>
+                                handleSelectcomponent("All Components")
+                              }
+                              className="block w-full text-left px-4 py-2 text-base
                             whitespace-nowrap hover:bg-blue-100
                      text-teal-400 dark:hover:bg-neutral-700 "
-                          >
-                            All Components
-                          </button>
-
-                          {componentsOption.map((component) => (
-                            <button
-                              key={component}
-                              onClick={() => handleSelectcomponent(component)}
-                              className="block w-full text-left px-4 py-2 text-base text-blue-200 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
                             >
-                              {component}
+                              All Components
                             </button>
-                          ))}
+
+                            {componentsOption.map((component) => (
+                              <button
+                                key={component}
+                                onClick={() => handleSelectcomponent(component)}
+                                className="block w-full text-left px-4 py-2 text-base text-blue-200 whitespace-nowrap hover:bg-blue-100  dark:hover:bg-neutral-700"
+                              >
+                                {component}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            </th>
+                  )}
+                </div>
+              </th>
 
-            <th className="py-2 border border-cyan-950   w-[2%]">Model</th>
-            <th className="py-2 border border-cyan-950   w-[1%]">Healthscore</th>
-            <th className="py-2 border border-cyan-950   w-[1%]">Actual value</th>
-            <th className="py-2 border border-cyan-950   w-[1%]">Units</th>
-          </tr>
-        </thead>
+              <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                Model
+              </th>
+              <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                Healthscore
+              </th>
+              <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                Actual value
+              </th>
+              <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                Units
+              </th>
+            </tr>
+          </thead>
 
-        {/* data in row */}
-        <tbody>
-          {paginatedData.map((row, index) => {
-            const globalIndex = (currentPage - 1) * pageSize + index;
-            const isSelected = selectedRowGlobalIndex === globalIndex;
-            return (
-              <tr
-                key={globalIndex}
-                className={`cursor-pointer transition duration-300 ease-in-out ${
-                  isSelected
-                    ? "bg-green-600 text-white "
-                    : row.Caution === 1
-                    ? "bg-caution-1 text-white hover:bg-caution-blue-gradient text-lg font-medium font-kanit"
-                    : row.Caution === 0.5
-                    ? "bg-yellow-500 text-black hover:bg-caution-blue-gradient text-lg font-medium "
-                    : "bg-caution-0 marker: text-black hover:bg-caution-blue-gradient font-light text-base"
-                }`}
-                onClick={() => setSelectedRowGlobalIndex(globalIndex)}
-                // เลือกแถว + เปิด modal edit ทันที
-                onDoubleClick={() => {
-                  setSelectedRowGlobalIndex(globalIndex);
-                  setShowModal(true);
-                }}
-              >
-                {/* time row detail */}
-                <td className="py-2 border-2 border-cyan-950 text-lg ">{row.TIME}</td>
-                {/* plant row detail */}
-                <td className="py-2 border-2 border-cyan-950  text-lg ">
-                  <div className="flex items-center space-x-2 h-full justify-center">
-                    <UserGroupIcon
-                      className="w-7 h-7 cursor-pointer rounded-full p-1 bg-blue-600 text-white ml-3"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        const plant = row.PLANT;
-                        const tooltip = roleMap[plant];
-                        const htmlContent = (
-                          <div className="mt-2 flex flex-col font-kanit">
-                            <div className="flex items-center gap-2 text-lg font-kanit">
-                              <WrenchScrewdriverIcon
-                                className="w-9 h-9 bg-blue-600
+          {/* data in row */}
+          <tbody>
+            {paginatedData.map((row, index) => {
+              const globalIndex = (currentPage - 1) * pageSize + index;
+              const isSelected = selectedRowGlobalIndex === globalIndex;
+              return (
+                <tr
+                  key={globalIndex}
+                  className={`cursor-pointer transition duration-300 ease-in-out sm:text-base md:text-lg h-[36px] ${
+                    isSelected
+                      ? "bg-green-600 text-white "
+                      : row.Caution === 1
+                      ? "bg-caution-1 text-white hover:bg-caution-blue-gradient text-lg font-medium font-kanit"
+                      : row.Caution === 0.5
+                      ? "bg-yellow-500 text-black hover:bg-caution-blue-gradient text-lg font-medium "
+                      : "bg-caution-0 marker: text-black hover:bg-caution-blue-gradient font-light text-base"
+                  }`}
+                  onClick={() => setSelectedRowGlobalIndex(globalIndex)}
+                  // เลือกแถว + เปิด modal edit ทันที
+                  onDoubleClick={() => {
+                    setSelectedRowGlobalIndex(globalIndex);
+                    setShowModal(true);
+                     setSelectedRowKey(getRowKey(row));
+                  }}
+                >
+                  {/* time row detail */}
+                  <td className="py-2 border-2 border-cyan-950 text-lg ">
+                    {row.TIME}
+                  </td>
+                  {/* plant row detail */}
+                  <td className="py-2 border-2 border-cyan-950  text-lg ">
+                    <div className="flex items-center space-x-2 h-full justify-center">
+                      <UserGroupIcon
+                        className="w-7 h-7  md:w-7 md:h-7 cursor-pointer rounded-full p-1 bg-blue-600 text-white ml-3"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const plant = row.PLANT;
+                          const tooltip = roleMap[plant];
+                          const htmlContent = (
+                            <div className="mt-2 flex flex-col font-kanit">
+                              <div className="flex items-center gap-2 text-lg font-kanit">
+                                <WrenchScrewdriverIcon
+                                  className="w-9 h-9 bg-blue-600
                               text-white p-1 rounded-full"
-                              />
-                              <strong className="whitespace-nowrap">
-                                Machine Diagnostic Engineer :
-                              </strong>
-                              <span
-                                className="inline-flex items-center justify-center rounded-full
+                                />
+                                <strong className="whitespace-nowrap">
+                                  Machine Diagnostic Engineer :
+                                </strong>
+                                <span
+                                  className="inline-flex items-center justify-center rounded-full
                                  bg-rose-700 px-4 py-1 text-base font-medium text-white
                                  ring-1 ring-gray-500/10 ring-inset
                                  max-w-[350px] whitespace-nowrap overflow-hidden text-ellipsis"
-                              >
-                                {tooltip.engineer}
-                              </span>
-                            </div>
-                            <br />
-                            <div className="flex items-center gap-2 text-lg font-kanit">
-                              <ComputerDesktopIcon className="w-9 h-9 bg-blue-600 text-white p-1 rounded-full" />
-                              <strong className="whitespace-nowrap">
-                                Machine Monitoring Officer :
-                              </strong>
-                              <span
-                                className="inline-flex items-center justify-center rounded-full
+                                >
+                                  {tooltip.engineer}
+                                </span>
+                              </div>
+                              <br />
+                              <div className="flex items-center gap-2 text-lg font-kanit">
+                                <ComputerDesktopIcon className="w-9 h-9 bg-blue-600 text-white p-1 rounded-full" />
+                                <strong className="whitespace-nowrap">
+                                  Machine Monitoring Officer :
+                                </strong>
+                                <span
+                                  className="inline-flex items-center justify-center rounded-full
                                 bg-rose-600 px-4 py-1 text-base font-medium text-white
                               ring-1 ring-gray-500/10 ring-inset
                               max-w-[300px] whitespace-nowrap overflow-hidden text-ellipsis"
-                              >
-                                {tooltip.officer}
-                              </span>
+                                >
+                                  {tooltip.officer}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        );
-                        const htmlString =
-                          ReactDOMServer.renderToStaticMarkup(htmlContent);
+                          );
+                          const htmlString =
+                            ReactDOMServer.renderToStaticMarkup(htmlContent);
 
-                        Swal.fire({
-                          position: "top-end",
-                          icon: undefined,
-                          html: `
+                          Swal.fire({
+                            position: "top-end",
+                            icon: undefined,
+                            html: `
                           <div class="rounded-md overflow-hidden shadow-lg w-full max-w-xl">
                       <div class="flex items-center justify-between bg-modal-gradient p-4">
                        <div class="flex items-center space-x-2">
@@ -894,154 +948,161 @@ const filteredData = data.filter((row) => {
                                   </div>
                          </div>
                           `,
-                          toast: false,
-                          showCloseButton: false, // ปิดปุ่ม Close ของ Swal
-                          showConfirmButton: false,
-                          background: "transparent",
-                          color: "#ffffff",
-                          timer: null,
-                          customClass: {
-                            popup: "shadow-none p-0 max-w-xl w-full ",
-                          },
-                          didOpen: () => {
-                            // ผูก event ให้ปุ่ม Close ที่เราสร้างเอง
-                            const closeBtn =
-                              document.getElementById("swalCloseBtn");
-                            if (closeBtn) {
-                              closeBtn.addEventListener("click", () =>
-                                Swal.close()
-                              );
-                            }
-                          },
-                          showClass: {
-                            popup:
-                              "animate__animated animate__fadeInRight animate__faster",
-                          },
-                          hideClass: {
-                            popup:
-                              "animate__animated animate__fadeOutRight animate__faster",
-                          },
-                          willClose: () => {
-                            document.body.style.overflow = "";
-                          },
-                        });
-                      }}
-                    />
-                    <span>{row.PLANT || "-"}</span>
-                  </div>
-                </td>
-                <td className="py-2 border text-lg border-cyan-950">{row.MACHINE}</td>
-                <td className="py-2 border text-base border-cyan-950">{row.COMPONENT}</td>
-                <td className=" border text-center whitespace-normal border-cyan-950 ">
-                  <span className="flex items-center space-x-2 w-auto">
-                    <span className="text-base py-2 mx-2 truncate break-words">
-                      {row.MODEL}
-                    </span>
-                    {typeof row.Note === "string" &&
-                      row.Note.trim() !== "" &&
-                      row.Note.trim().toLowerCase() !== "null" &&
-                      row.Note.trim().toLowerCase() !== "undefined" && (
-                        <Badge color="secondary" badgeContent={0}>
-                          <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75"></span>
-                          <EnvelopeIcon
-                            className="w-6 h-6 cursor-pointer text-green-900 animate-fadeInSlideIn"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const acknowledge = row.Acknowledge || "N/A";
-                              const noteText = row.Note || "No note";
-                              const htmlContent = (
-                                <div className="mt-2 w-max font-kanit">
-                                  <p className="flex items-center gap-2 break-words whitespace-pre-wrap">
-                                    <CalendarIcon className="w-7 h-7 inline-block" />
-                                    <strong>
-                                      Acknowledge Time :
-                                      <span
-                                        className="inline-flex items-center  px-2 py-1 text-lg font-bold
-                                       text-rose-700  my-2 mx-2"
-                                      >
-                                        {acknowledge}
-                                      </span>
-                                    </strong>
-                                  </p>
-
-                                  <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1 ">
-                                    <ChatBubbleLeftEllipsisIcon className="w-7 h-7 inline-block " />
-                                    <strong> Note: </strong>
-                                    <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
-                                      {noteText}
-                                    </span>
-                                  </p>
-                                </div>
-                              );
-                              const htmlString =
-                                ReactDOMServer.renderToStaticMarkup(
-                                  htmlContent
+                            toast: false,
+                            showCloseButton: false, // ปิดปุ่ม Close ของ Swal
+                            showConfirmButton: false,
+                            background: "transparent",
+                            color: "#ffffff",
+                            timer: null,
+                            customClass: {
+                              popup: "shadow-none p-0 max-w-xl w-full ",
+                            },
+                            didOpen: () => {
+                              // ผูก event ให้ปุ่ม Close ที่เราสร้างเอง
+                              const closeBtn =
+                                document.getElementById("swalCloseBtn");
+                              if (closeBtn) {
+                                closeBtn.addEventListener("click", () =>
+                                  Swal.close()
                                 );
-                              Swal.fire({
-                                position: "top-end",
-                                icon: undefined,
-                                html: `
-                                   <div class="rounded-md overflow-hidden shadow-lg w-full max-w-md">
-                                      <div class="flex items-center justify-between bg-modal-gradient p-4">
-                                          <div class="flex items-center space-x-2">
-                                             <svg class="w-8 h-8 text-white inline-block bg-green-600 rounded-full p-1"
-                                               fill="currentColor" viewBox="0 0 24 24">
-                                               ${iconnoteHtml}
-                                             </svg>
-                                    <span class="text-white text-xl font-bold font-kanit">Time & Acknowledge</span>
-                                       </div>
-                                   <button id="swalCloseBtn" class="text-white text-2xl font-bold focus:outline-none">&times;</button>
-                                     </div>
-                                  <div class="p-4 bg-violet-100 text-black">
-                                    ${htmlString}
-                                      </div>
-                                      </div>
-                                        `,
-                                toast: false,
-                                showCloseButton: false, // ใช้ปุ่ม close เองแทน
-                                showConfirmButton: false,
-                                background: "transparent",
-                                color: "#ffffff",
-                                timer: 3000,
-                                customClass: {
-                                  popup: "shadow-none p-0",
-                                },
-                                didOpen: () => {
-                                  const closeBtn =
-                                    document.getElementById("swalCloseBtn");
-                                  if (closeBtn) {
-                                    closeBtn.addEventListener("click", () =>
-                                      Swal.close()
-                                    );
-                                  }
-                                },
-                                showClass: {
-                                  popup:
-                                    "animate__animated animate__fadeInRight animate__faster",
-                                },
-                                hideClass: {
-                                  popup:
-                                    "animate__animated animate__fadeOutRight animate__faster",
-                                },
-                                willClose: () => {
-                                  document.body.style.overflow = "";
-                                },
-                              });
-                            }}
-                          />
-                        </Badge>
-                      )}
-                  </span>
-                </td>
+                              }
+                            },
+                            showClass: {
+                              popup:
+                                "animate__animated animate__fadeInRight animate__faster",
+                            },
+                            hideClass: {
+                              popup:
+                                "animate__animated animate__fadeOutRight animate__faster",
+                            },
+                            willClose: () => {
+                              document.body.style.overflow = "";
+                            },
+                          });
+                        }}
+                      />
+                      <span>{row.PLANT || "-"}</span>
+                    </div>
+                  </td>
+                  <td className="py-2 border text-lg border-cyan-950">
+                    {row.MACHINE}
+                  </td>
+                  <td className="py-2 border text-base border-cyan-950">
+                    {row.COMPONENT}
+                  </td>
+                  <td className="border text-center whitespace-normal border-cyan-950 ">
+                    <span className="flex items-center space-x-2 w-auto">
+                      <span className="text-base py-2 mx-2 truncate break-words">
+                        {row.MODEL}
+                      </span>
+                      {typeof row.Note === "string" &&
+                        row.Note.trim() !== "" &&
+                        row.Note.trim().toLowerCase() !== "null" &&
+                        row.Note.trim().toLowerCase() !== "undefined" && (
+                          <Badge color="secondary" badgeContent={0}>
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75"></span>
+                            <EnvelopeIcon
+                              className="w-6 h-6 cursor-pointer text-green-900 animate-fadeInSlideIn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const acknowledge = row.Acknowledge || "N/A";
+                                const noteText = row.Note || "No note";
+                                const htmlContent = (
+                                  <div className="mt-2 w-max font-kanit">
+                                    <p className="flex items-center gap-2 break-words whitespace-pre-wrap">
+                                      <CalendarIcon className="w-7 h-7 inline-block" />
+                                      <strong>
+                                        Acknowledge Time :
+                                        <span className="inline-flex items-center  px-2 py-1 text-lg font-bold text-rose-700  my-2 mx-2">
+                                          {acknowledge}
+                                        </span>
+                                      </strong>
+                                    </p>
 
-                <td className="py-2 border text-base border-cyan-950 ">{row.HEALTHSCORE}</td>
-                <td className="py-2 border text-base border-cyan-950">{row.Actual_Value}</td>
-                <td className="py-2 border text-base border-cyan-950">{row.UNITS}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+                                    <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1 ">
+                                      <ChatBubbleLeftEllipsisIcon className="w-7 h-7 inline-block " />
+                                      <strong> Note: </strong>
+                                      <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
+                                        {noteText}
+                                      </span>
+                                    </p>
+                                  </div>
+                                );
+                                const htmlString =
+                                  ReactDOMServer.renderToStaticMarkup(
+                                    htmlContent
+                                  );
+                                Swal.fire({
+                                  position: "top-end",
+                                  icon: undefined,
+                                  html: `
+                  <div class="rounded-md overflow-hidden shadow-lg w-full max-w-md">
+                    <div class="flex items-center justify-between bg-modal-gradient p-4">
+                      <div class="flex items-center space-x-2">
+                        <svg class="w-8 h-8 text-white inline-block bg-green-600 rounded-full p-1" fill="currentColor" viewBox="0 0 24 24">
+                          ${iconnoteHtml}
+                        </svg>
+                        <span class="text-white text-xl font-bold font-kanit">Time & Acknowledge</span>
+                      </div>
+                      <button id="swalCloseBtn" class="text-white text-2xl font-bold focus:outline-none">&times;</button>
+                    </div>
+                    <div class="p-4 bg-violet-100 text-black">
+                      ${htmlString}
+                    </div>
+                  </div>
+                `,
+                                  toast: false,
+                                  showCloseButton: false, // ใช้ปุ่ม close เองแทน
+                                  showConfirmButton: false,
+                                  background: "transparent",
+                                  color: "#ffffff",
+                                  timer: 3000,
+                                  customClass: {
+                                    popup: "shadow-none p-0",
+                                  },
+                                  didOpen: () => {
+                                    const closeBtn =
+                                      document.getElementById("swalCloseBtn");
+                                    if (closeBtn) {
+                                      closeBtn.addEventListener("click", () =>
+                                        Swal.close()
+                                      );
+                                    }
+                                  },
+                                  showClass: {
+                                    popup:
+                                      "animate__animated animate__fadeInRight animate__faster",
+                                  },
+                                  hideClass: {
+                                    popup:
+                                      "animate__animated animate__fadeOutRight animate__faster",
+                                  },
+                                  willClose: () => {
+                                    document.body.style.overflow = "";
+                                  },
+                                });
+                              }}
+                            />
+                          </Badge>
+                        )}
+                    </span>
+                  </td>
+
+                  <td className="py-2 border text-base border-cyan-950 ">
+                    {row.HEALTHSCORE}
+                  </td>
+                  <td className="py-2 border text-base border-cyan-950">
+                    {row.Actual_Value}
+                  </td>
+                  <td className="py-2 border text-base border-cyan-950">
+                    {row.UNITS}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* render modal ก็ต่อเมื่อมีค่าเป็นtrue และคลิกเลือกแถวแล้ว*/}
       {showModal && selectedRowGlobalIndex !== null && (
@@ -1133,7 +1194,7 @@ const filteredData = data.filter((row) => {
         </div>
       )}
 
-      <div className="w-fit mt-5 flex items-center justify-center mx-auto">
+      <div className="w-full overflow-x-auto mt-5 flex items-center justify-center">
         <Stack spacing={2}>
           <Pagination
             count={Math.ceil(filteredData.length / pageSize)}
@@ -1145,10 +1206,10 @@ const filteredData = data.filter((row) => {
                 backgroundColor: "#1e40af",
                 borderRadius: "100%",
                 fontWeight: "bold",
-                fontSize: "22px", // ปรับขนาดตัวอักษรให้ใหญ่ขึ้น
-                padding: "2px", // เพิ่ม padding ให้ปุ่มใหญ่ขึ้น
-                width: "45px", // กำหนดความกว้างให้ปุ่ม
-                height: "45px", // กำหนดความสูงให้ปุ่ม
+                fontSize: "18px", // ลดขนาดฟอนต์ลงเล็กน้อย
+                minWidth: "48px", // ใช้ minWidth แทน width
+                height: "48px", // หรือเพิ่มความสูง
+                padding: "4px",
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af", // สีข้อความตอนถูกเลือก
