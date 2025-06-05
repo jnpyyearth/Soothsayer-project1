@@ -23,40 +23,36 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
       )
     : [];
 
-          const reloadPage = () => {
-    window.location.reload();
-  };
+const handleClear = () => {
+  setSearchTerm(""); // แค่ล้างค่า searchTerm
+};
 
  return (
-  <div className="px-6 ">
-    {/* logo อยู่บรรทัดแรก */}
-<div className="flex justify-center items-center h-auto p-3 mt-2 max-h-[50px]">
-  <img
-    src={logoImage}
-    className="cursor-pointer w-42 h-auto "
-    id="logolink"
-    alt="logosoothsayer"
-    onClick={onLogoClick}
-  />
-</div>
+   <div className="px-6 ">
+     {/* logo อยู่บรรทัดแรก */}
+     <div className="flex justify-center items-center h-auto p-3 mt-2 max-h-[50px]">
+       <img
+         src={logoImage}
+         className="cursor-pointer w-42 h-auto "
+         id="logolink"
+         alt="logosoothsayer"
+         onClick={onLogoClick}
+       />
+     </div>
 
-
-    {/* searchbar อยู่บรรทัดถัดมา */}
-    <div className="relative w-full max-w-md">
-      <span className= "flex flex-col-2">
+     {/* searchbar อยู่บรรทัดถัดมา */}
+     <div className="relative w-full px-4 mt-2">
+       <div className="flex justify-end items-center gap-2">
          <SearchBar
-        className="w-full"
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        suggestions={suggestions}
-      />
-
-       <Clearall onReload={reloadPage}/>
-      </span>
-     
-    </div>
-  </div>
-);
+           searchTerm={searchTerm}
+           setSearchTerm={setSearchTerm}
+           suggestions={suggestions}
+         />
+         <Clearall onClear={handleClear} />
+       </div>
+     </div>
+   </div>
+ );
 }
 
 export default Header;
