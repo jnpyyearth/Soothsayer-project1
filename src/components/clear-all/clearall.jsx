@@ -4,7 +4,7 @@ function Clearall({ onReload }) {
   return (
     <div>
       <button
-        className="flex bg-sky-700 text-zinc-50 rounded-md text-lg font-kanit mt-4 px-3 py-3 ml-4 cursor-pointer
+        className="flex bg-sky-700 text-zinc-50 rounded-md text-lg font-kanit px-3 py-3 ml-4 cursor-pointer
          w-[150px] whitespace-nowrap hover:bg-sky-900 "
         onClick={onReload}
       >

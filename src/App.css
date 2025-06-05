@@ -1,11 +1,34 @@
 #root {
-  /* max-width: 1280px; */
-   /* margin: 0 auto; */
-  /*padding: 2rem; */
   text-align: center;
 }
 
 .swal2-custom-title {
   font-size: large;
   font-weight: bold;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.full-height {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.table-container {
+  height: calc(100vh - 80px); /* ปรับ 80px ตามความสูงของ header หรือ margin/padding ที่คุณมี */
+  overflow: hidden;
+  padding-bottom: 60px;
+}
+
+.table-scroll-area {
+  height: 100%;
+  overflow: auto;
+}
+
+.table-row {
+  height: 35px; /* ความสูงของแต่ละแถว ลองปรับให้พอดีกับ font-size + padding */
 }

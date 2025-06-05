@@ -6,7 +6,7 @@ import Table from './components/table/table';
    function App() {
   return (
     <div className=" overflow-hidden">
-      <div className="aspect-[16/9]">
+      <div className="">
         <Table />
       </div>
     </div>

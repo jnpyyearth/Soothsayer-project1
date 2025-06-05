@@ -1,17 +1,34 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import {UserGroupIcon,CalendarIcon,UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,
-  EnvelopeIcon,WrenchScrewdriverIcon,ComputerDesktopIcon,CogIcon,BuildingOffice2Icon,ClockIcon} from "@heroicons/react/24/solid";
+import {
+  UserGroupIcon,
+  CalendarIcon,
+  UserIcon,
+  ChatBubbleLeftEllipsisIcon,
+  EnvelopeOpenIcon,
+  EnvelopeIcon,
+  WrenchScrewdriverIcon,
+  ComputerDesktopIcon,
+  CogIcon,
+  BuildingOffice2Icon,
+  ClockIcon,
+} from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
 import Badge from "@mui/material/Badge";
 import Pagination from "@mui/material/Pagination";
-import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
+import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import Stack from "@mui/material/Stack";
 import ReactDOMServer from "react-dom/server";
-import {FormControl,FormLabel,RadioGroup,FormControlLabel,Radio,} from '@mui/material';
+import {
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
 import "react-datepicker/dist/react-datepicker.css";
 
-//ฟังก์ชั่นกดนอกบริเวณ area ให้ปิดdropdown หรือ modal 
+//ฟังก์ชั่นกดนอกบริเวณ area ให้ปิดdropdown หรือ modal
 function useMultipleOutsideClick(dropdowns) {
   useEffect(() => {
     function handleClickOutside(event) {
@@ -43,7 +60,7 @@ function Table() {
   const [selectedRowGlobalIndex, setSelectedRowGlobalIndex] = useState(null); //เก็บค่าการเลือกแถว
   const [showModal, setShowModal] = useState(false);
   const [note, setNote] = useState(""); //เก็บค่าnote
-  const [action, setAction] = useState("0"); 
+  const [action, setAction] = useState("0");
   const [customCaution, setCustomCaution] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -51,7 +68,6 @@ function Table() {
   const [selectedDate, setSelectedDate] = useState("");
   const pageSize = 25; //กำหนดให้แสดง 25 แถว
   const [selectedRowKey, setSelectedRowKey] = useState(null);
-
 
   //ปิด modal ใน 3 วิ
   const closeModalWithFade = () => {
@@ -62,13 +78,13 @@ function Table() {
     }, 300);
   };
 
-const reloadPage = () => {
-  setAction("");                // reset action input
-  setCustomCaution("");         // reset custom caution
-  setNote("");                  // reset note field
-  setSelectedRowGlobalIndex(null); // reset row selection
-  // อย่าทำ fetchData() ถ้าไม่ต้องการโหลดข้อมูลเดิมกลับมา
-};
+  const reloadPage = () => {
+    setAction(""); // reset action input
+    setCustomCaution(""); // reset custom caution
+    setNote(""); // reset note field
+    setSelectedRowGlobalIndex(null); // reset row selection
+    // อย่าทำ fetchData() ถ้าไม่ต้องการโหลดข้อมูลเดิมกลับมา
+  };
 
   //array data engineer & officer
   const roleMap = {
@@ -77,8 +93,14 @@ const reloadPage = () => {
     GSP2: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
     GSP3: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
     GSP4: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
-    GSP5: {engineer: "Piyarach Somwatcharajit",officer: "Issarapong Tumhonyam",},
-    GSP6: {engineer: "Piyarach Somwatcharajit",officer: "Issarapong Tumhonyam",},
+    GSP5: {
+      engineer: "Piyarach Somwatcharajit",
+      officer: "Issarapong Tumhonyam",
+    },
+    GSP6: {
+      engineer: "Piyarach Somwatcharajit",
+      officer: "Issarapong Tumhonyam",
+    },
     GPPP: { engineer: "Apichai Mekha", officer: "Issarapong Tumhonyam" },
   };
 
@@ -96,7 +118,9 @@ const reloadPage = () => {
   const machineRef = useRef(null);
 
   const [componentsOpen, setComponentopen] = useState(false);
-  const [selectedcomponents, setSelectedcomponents] = useState("Select All Components");
+  const [selectedcomponents, setSelectedcomponents] = useState(
+    "Select All Components"
+  );
   const componentsRef = useRef(null);
 
   // option dropdown plant-machine-components
@@ -116,7 +140,7 @@ const reloadPage = () => {
     }
   }, [data]);
 
-  //load data plant in row 
+  //load data plant in row
   useEffect(() => {
     if (selectedPlant && selectedPlant !== "All Plants") {
       const machines = Array.from(
@@ -158,24 +182,25 @@ const reloadPage = () => {
     } else {
       setComponentsoptions([]);
     }
- // รีเซ็ตตัวเลือก dropdown-list component เมื่อได้เลือกชื่อ machine ใหม่
+    // รีเซ็ตตัวเลือก dropdown-list component เมื่อได้เลือกชื่อ machine ใหม่
     setSelectedcomponents("All Components");
   }, [selectedmachine, selectedPlant, data]);
 
   //fetch api
-const fetchData = () => {
-  fetch("/get_data")
-    .then((res) => res.json())
-    .then((json) => {
-      console.log("Fetched data: ", json);  // ตรวจสอบข้อมูลที่ได้จาก API
-      setData(json);  // อัปเดต state 'data' กับข้อมูลใหม่
-    })
-    .catch((err) => console.error("Error fetching data:", err));  // ตรวจสอบ error ในการดึงข้อมูล
-};
+  const fetchData = () => {
+    fetch("/get_data")
+      .then((res) => res.json())
+      .then((json) => {
+        console.log("Fetched data: ", json); // ตรวจสอบข้อมูลที่ได้จาก API
+        setData(json); // อัปเดต state 'data' กับข้อมูลใหม่
+      })
+      .catch((err) => console.error("Error fetching data:", err)); // ตรวจสอบ error ในการดึงข้อมูล
+  };
 
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  useEffect(() => {fetchData();}, []);
- 
   //รีเฟรชหน้าอัตโนมัติทุกครั้งที่นาฬิกาเดินถึง “นาทีที่ 31 วินาทีที่ 0”
   useEffect(() => {
     const interval = setInterval(() => {
@@ -188,7 +213,7 @@ const fetchData = () => {
   }, []);
 
   // ตั้งค่า dropdown โดยใช้ Hook "useMemo" ให้จดจำค่าที่รับจากตัวแปรหรือค่าของarray
-  //ในกรณีนี้จะเก็บค่าของ plant machine และ components ที่มีข้อมูลที่เชื่อมโยงซึ่งกันและกัน 
+  //ในกรณีนี้จะเก็บค่าของ plant machine และ components ที่มีข้อมูลที่เชื่อมโยงซึ่งกันและกัน
   // หากเลือก plant มา ข้อมูลของmachine จะนำค่าข้อมูลที่มีอยู่ในplant นั้นมาแสดงทั้งหมดใน dropdownlist และสำหรับcomponent ก็ใช้หลักการเดียวกัน
   const dropdowns = useMemo(
     () => ({
@@ -211,7 +236,7 @@ const fetchData = () => {
     }),
     [open, plantDropdownOpen, machineOpen, componentsOpen]
   );
- 
+
   useMultipleOutsideClick(dropdowns); //ฟังก์ชั่นเมื่อคลิกนอกบริเวณให้ปิดพวกmodal dropdownlist โดยอัตโนมัติ
 
   //ช่วงเวลาของ dropdown 4 ช่วง ช่วงละ 6 ชั่วโมง
@@ -221,8 +246,8 @@ const fetchData = () => {
     "12:00 - 17:59",
     "18:00 - 23:59",
   ];
- 
-  //setting  การคลิกเลือกเปิดdropdown 
+
+  //setting  การคลิกเลือกเปิดdropdown
   const handleSelectTime = (timeRange) => {
     setSelectedTime(timeRange);
     setOpen(false);
@@ -257,79 +282,84 @@ const fetchData = () => {
     setCurrentPage(1);
   };
 
- // กรองข้อมูลตามไฟล์ มาไว้ในแต่ละคอลัมน์ แต่ละแถวในตาราง
-const filteredData = data.filter((row) => {
-  const matchTime = isTimeInRange(row.TIME, selectedTime);
-  let rowDateOnly = "";
-  if (row.TIME) {
-    // แปลงวันที่จากรูปแบบ DD/MM/YYYY เป็น YYYY-MM-DD 
-    const [day, month, year] = row.TIME.split(" ")[0].split("/");
-    rowDateOnly = `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
-  }
-  const matchDate = selectedDate === "" || rowDateOnly === selectedDate;
-  const matchPlant =
-    selectedPlant === "All Plants" || row.PLANT === selectedPlant;
-  const matchComponent =
-    selectedcomponents === "All Components" ||
-    row.COMPONENT === selectedcomponents;
-  const matchMachine =
-    selectedmachine === "Select All Machine" || row.MACHINE === selectedmachine;
-  const lowerSearch = searchTerm.toLowerCase();
-  const matchSearch =
-    !searchTerm ||
-    row.MODEL.toLowerCase().includes(lowerSearch) ||
-    row.COMPONENT.toLowerCase().includes(lowerSearch) ||
-    row.UNITS.toLowerCase().includes(lowerSearch);
+  // กรองข้อมูลตามไฟล์ มาไว้ในแต่ละคอลัมน์ แต่ละแถวในตาราง
+  const filteredData = data
+    .filter((row) => {
+      const matchTime = isTimeInRange(row.TIME, selectedTime);
+      let rowDateOnly = "";
+      if (row.TIME) {
+        // แปลงวันที่จากรูปแบบ DD/MM/YYYY เป็น YYYY-MM-DD
+        const [day, month, year] = row.TIME.split(" ")[0].split("/");
+        rowDateOnly = `${year}-${month.padStart(2, "0")}-${day.padStart(
+          2,
+          "0"
+        )}`;
+      }
+      const matchDate = selectedDate === "" || rowDateOnly === selectedDate;
+      const matchPlant =
+        selectedPlant === "All Plants" || row.PLANT === selectedPlant;
+      const matchComponent =
+        selectedcomponents === "All Components" ||
+        row.COMPONENT === selectedcomponents;
+      const matchMachine =
+        selectedmachine === "Select All Machine" ||
+        row.MACHINE === selectedmachine;
+      const lowerSearch = searchTerm.toLowerCase();
+      const matchSearch =
+        !searchTerm ||
+        row.MODEL.toLowerCase().includes(lowerSearch) ||
+        row.COMPONENT.toLowerCase().includes(lowerSearch) ||
+        row.UNITS.toLowerCase().includes(lowerSearch);
 
-  return (
-    matchDate &&
-    matchTime &&
-    matchPlant &&
-    matchComponent &&
-    matchMachine &&
-    matchSearch
-  );
-})
-// filter sort ข้อมูลแสดงเดือนล่าสุดก่อน โดยมีการเรียงค่าcaution
-.sort((a, b) => {
-  // เรียง Caution ก่อน
-  const cautionOrder = b.Caution - a.Caution;
-  if (cautionOrder !== 0) return cautionOrder;
+      return (
+        matchDate &&
+        matchTime &&
+        matchPlant &&
+        matchComponent &&
+        matchMachine &&
+        matchSearch
+      );
+    })
+    // filter sort ข้อมูลแสดงเดือนล่าสุดก่อน โดยมีการเรียงค่าcaution
+    .sort((a, b) => {
+      // เรียง Caution ก่อน
+      const cautionOrder = b.Caution - a.Caution;
+      if (cautionOrder !== 0) return cautionOrder;
 
-  // แปลงแค่วันที่ (โดยไม่เอาเวลามาคิด)
-  function parseDate(dateTimeStr) {
-    if (!dateTimeStr) return new Date(0);
-    const [datePart] = dateTimeStr.split(" ");
-    const [day, month, year] = datePart.split("/");
-    const dayPadded = day.padStart(2, "0");
-    const monthPadded = month.padStart(2, "0");
-    return new Date(`${year}-${monthPadded}-${dayPadded}`);
-  }
+      // แปลงแค่วันที่ (โดยไม่เอาเวลามาคิด)
+      function parseDate(dateTimeStr) {
+        if (!dateTimeStr) return new Date(0);
+        const [datePart] = dateTimeStr.split(" ");
+        const [day, month, year] = datePart.split("/");
+        const dayPadded = day.padStart(2, "0");
+        const monthPadded = month.padStart(2, "0");
+        return new Date(`${year}-${monthPadded}-${dayPadded}`);
+      }
 
-  // แปลงเวลาเฉพาะชั่วโมงและนาที (แปลงเป็นนาที)
-  function parseTimeInMinutes(dateTimeStr) {
-    if (!dateTimeStr) return 0;
-    const parts = dateTimeStr.split(" ");
-    const timePart = parts.length > 1 ? parts[1] : "00:00";
-    const [hh, mm] = timePart.split(":");
-    return parseInt(hh) * 60 + parseInt(mm);
-  }
+      // แปลงเวลาเฉพาะชั่วโมงและนาที (แปลงเป็นนาที)
+      function parseTimeInMinutes(dateTimeStr) {
+        if (!dateTimeStr) return 0;
+        const parts = dateTimeStr.split(" ");
+        const timePart = parts.length > 1 ? parts[1] : "00:00";
+        const [hh, mm] = timePart.split(":");
+        return parseInt(hh) * 60 + parseInt(mm);
+      }
 
-  const dateA = parseDate(a.TIME);
-  const dateB = parseDate(b.TIME);
+      const dateA = parseDate(a.TIME);
+      const dateB = parseDate(b.TIME);
 
-  // ถ้าวันต่างกัน ให้เรียงวันที่ (เดือนล่าสุดก่อน)
-  if (dateB.getTime() !== dateA.getTime()) {
-    return dateB - dateA;
-  }
+      // ถ้าวันต่างกัน ให้เรียงวันที่ (เดือนล่าสุดก่อน)
+      if (dateB.getTime() !== dateA.getTime()) {
+        return dateB - dateA;
+      }
 
-  // ถ้าวันเดียวกัน ให้เรียงเวลาจากมากไปน้อย (ชั่วโมงล่าสุดก่อน)
-  const timeA = parseTimeInMinutes(a.TIME);
-  const timeB = parseTimeInMinutes(b.TIME);
-  return timeB - timeA;
-});
+      // ถ้าวันเดียวกัน ให้เรียงเวลาจากมากไปน้อย (ชั่วโมงล่าสุดก่อน)
+      const timeA = parseTimeInMinutes(a.TIME);
+      const timeB = parseTimeInMinutes(b.TIME);
+      return timeB - timeA;
+    });
 
- //ฟิลเตอร์การรีโหลดหน้า
+  //ฟิลเตอร์การรีโหลดหน้า
   const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -360,98 +390,101 @@ const filteredData = data.filter((row) => {
       });
     }
   };
-  
 
+  //save ข้อมูล caution model ใหม่ และ Post ไปที่ API
+  const handleSave = () => {
+    let newCaution =
+      action === "custom" ? parseFloat(customCaution) : parseFloat(action);
 
+    if (isNaN(newCaution)) {
+      Swal.fire(
+        "Invalid Input",
+        "Please enter a valid custom value.",
+        "warning"
+      );
+      return;
+    }
 
-  //save ข้อมูล caution model ใหม่ และ Post ไปที่ API 
-const handleSave = () => {
-  let newCaution =
-    action === "custom" ? parseFloat(customCaution) : parseFloat(action);
+    const selectedRow = data.find((r) => getRowKey(r) === selectedRowKey);
+    if (!selectedRow) {
+      Swal.fire("Error", "Cannot find selected row.", "error");
+      return;
+    }
 
-  if (isNaN(newCaution)) {
-    Swal.fire("Invalid Input", "Please enter a valid custom value.", "warning");
-    return;
-  }
-
-  const selectedRow = data.find((r) => getRowKey(r) === selectedRowKey);
-  if (!selectedRow) {
-    Swal.fire("Error", "Cannot find selected row.", "error");
-    return;
-  }
-
-  fetch("http://localhost:5000/update_row", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      time: selectedRow.TIME,
-      model: selectedRow.MODEL,
-      machine: selectedRow.MACHINE,
-      component: selectedRow.COMPONENT,
-      newCaution: String(newCaution),
-      note: note ?? "",
-    }),
-  })
-    .then((res) => res.json())
-    .then((result) => {
-      if (result.status === "success") {
-        setData((prevData) => {
-          const newData = [...prevData];
-          const rowIndex = newData.findIndex(
-            (r) => getRowKey(r) === selectedRowKey
-          );
-          if (rowIndex !== -1) {
-            newData[rowIndex] = {
-              ...newData[rowIndex],
-              Caution: newCaution,
-              Note: note,
-              Acknowledge: result.acknowledge_time,
-            };
-          }
-          return newData;
-        });
-
-        Swal.fire({
-          title: "Saved",
-          text: `Updated at: ${result.acknowledge_time}`,
-          icon: "success",
-          confirmButtonText: "Save",
-          buttonsStyling: false,
-          customClass: {
-            confirmButton:
-              "bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2 rounded",
-            popup: "font-kanit",
-          },
-        }).then(() => {
-          setShowModal(false);
-          setSelectedRowGlobalIndex(null);
-        });
-      } else {
-        Swal.fire("Error", result.message, "error");
-      }
+    fetch("http://localhost:5000/update_row", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        time: selectedRow.TIME,
+        model: selectedRow.MODEL,
+        machine: selectedRow.MACHINE,
+        component: selectedRow.COMPONENT,
+        newCaution: String(newCaution),
+        note: note ?? "",
+      }),
     })
-    .catch((err) => {
-      console.error("Error details: ", err);
-      Swal.fire("Error", err.message || "Unknown error occurred", "error");
-    });
-};
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.status === "success") {
+          setData((prevData) => {
+            const newData = [...prevData];
+            const rowIndex = newData.findIndex(
+              (r) => getRowKey(r) === selectedRowKey
+            );
+            if (rowIndex !== -1) {
+              newData[rowIndex] = {
+                ...newData[rowIndex],
+                Caution: newCaution,
+                Note: note,
+                Acknowledge: result.acknowledge_time,
+              };
+            }
+            return newData;
+          });
 
+          Swal.fire({
+            title: "Saved",
+            text: `Updated at: ${result.acknowledge_time}`,
+            icon: "success",
+            confirmButtonText: "Save",
+            buttonsStyling: false,
+            customClass: {
+              confirmButton:
+                "bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-2 rounded",
+              popup: "font-kanit",
+            },
+          }).then(() => {
+            setShowModal(false);
+            setSelectedRowGlobalIndex(null);
+          });
+        } else {
+          Swal.fire("Error", result.message, "error");
+        }
+      })
+      .catch((err) => {
+        console.error("Error details: ", err);
+        Swal.fire("Error", err.message || "Unknown error occurred", "error");
+      });
 
-//คีย์เฉพาะของแถว เช่น TIME + PLANT + MACHINE + COMPONENT
-const getRowKey = (row) =>
-  `${row.TIME}||${row.PLANT}||${row.MACHINE}||${row.COMPONENT}`;
+        setAction("");
+        setCustomCaution("");
+        setNote("");
 
+        // ปิด modal
+        closeModalWithFade();
+  };
 
+  //คีย์เฉพาะของแถว เช่น TIME + PLANT + MACHINE + COMPONENT
+  const getRowKey = (row) =>
+    `${row.TIME}||${row.PLANT}||${row.MACHINE}||${row.COMPONENT}`;
 
-
-  //สร้าง html icon ที่จะเรียกใช้แสดงใน swal.fire 
+  //สร้าง html icon ที่จะเรียกใช้แสดงใน swal.fire
   const iconHtml = ReactDOMServer.renderToStaticMarkup(
     <UserGroupIcon className="inline-block w-5 h-5 mr-2 text-white" />
   );
-   const iconnoteHtml = ReactDOMServer.renderToStaticMarkup(
+  const iconnoteHtml = ReactDOMServer.renderToStaticMarkup(
     <EnvelopeOpenIcon className="inline-block w-5 h-5 mr-2 text-white" />
   );
-
 
   function normalizeTime(timeStr) {
     if (!timeStr || typeof timeStr !== "string") return null;
@@ -488,13 +521,13 @@ const getRowKey = (row) =>
   };
 
   return (
-    <div className="w-screen overflow-hidden box-border m-0 p-0">
+    <div className="w-screen h-full m-0 p-0">
       <div
         className="p-8 flex flex-col mx-auto font-kanit w-screen"
         style={{ tableLayout: "fixed" }}
       >
         <div
-          className="md:w-auto flex-col md:flex-row flex-grow  
+          className="md:w-auto flex-none p-4 md:flex-row 
       md:space-y-0 z-100 align-top h-full w-full "
         >
           <Header
@@ -507,14 +540,14 @@ const getRowKey = (row) =>
           />
         </div>
 
-        <div class="h-full">
+        <div class="flex-grow overflow-y-auto px-4 pb-2">
           <table
-            className="w-full table-auto text-xs sm:text-sm md:text-base mt-6 overflow-visible md:overflow-x-visible 
-       overflow-x-auto"
+            className="w-full table-auto text-xs leading-tight sm:text-sm md:text-base overflow-visible md:overflow-x-visible 
+       overflow-x-auto font-kanit "
           >
             <thead className="bg-head-column text-lg text-white ">
-              <tr className="h-10">
-                <th className="min-w-[10rem] py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+              <tr className="h-9">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   {/* Time dropdown */}
                   <div className="inline-flex space-x-2 items-center">
                     {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
@@ -614,7 +647,7 @@ const getRowKey = (row) =>
                 </th>
 
                 {/* Plant dropdown */}
-                <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   <div className="relative inline-flex" ref={plantDropdownRef}>
                     <button
                       type="button"
@@ -687,7 +720,7 @@ const getRowKey = (row) =>
                 </th>
 
                 {/* Machine dropdown */}
-                <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   <div className="relative inline-flex" ref={machineRef}>
                     <button
                       type="button"
@@ -770,7 +803,7 @@ const getRowKey = (row) =>
                 </th>
 
                 {/* Components dropdown */}
-                <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   <div className="relative inline-flex" ref={componentsRef}>
                     <button
                       type="button"
@@ -853,16 +886,16 @@ const getRowKey = (row) =>
                   </div>
                 </th>
 
-                <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   Model
                 </th>
-                <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   Healthscore
                 </th>
-                <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   Actual value
                 </th>
-                <th className="min-w-[10rem] px-2 py-2 border border-cyan-950 text-xs md:text-sm lg:text-base">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   Units
                 </th>
               </tr>
@@ -1016,7 +1049,6 @@ const getRowKey = (row) =>
                           row.Note.trim().toLowerCase() !== "null" &&
                           row.Note.trim().toLowerCase() !== "undefined" && (
                             <Badge color="secondary" badgeContent={0}>
-                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-500 opacity-75"></span>
                               <EnvelopeIcon
                                 className="w-6 h-6 cursor-pointer text-green-900 animate-fadeInSlideIn"
                                 onClick={(e) => {
@@ -1038,7 +1070,8 @@ const getRowKey = (row) =>
                                       <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1 ">
                                         <ChatBubbleLeftEllipsisIcon className="w-7 h-7 inline-block " />
                                         <strong> Note: </strong>
-                                        <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1 ring-gray-500/10 ring-inset ml-1">
+                                        <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1
+                                        break-all ring-gray-500/10 ring-inset ml-1">
                                           {noteText}
                                         </span>
                                       </p>
@@ -1121,97 +1154,102 @@ const getRowKey = (row) =>
         </div>
       </div>
 
-      {/* render modal ก็ต่อเมื่อมีค่าเป็นtrue และคลิกเลือกแถวแล้ว*/}
-      {showModal && selectedRowGlobalIndex !== null && (
-        // bg blur จัดกลางจอ
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          {/* bg modal form */}
-          <div
-            className={`bg-pink-200 text-black p-4 rounded-lg shadow-lg w-[90%] max-w-md 
-          animate__animated animate__fadeInUp animate__faster  ${
-            isClosing ? "animate__fadeOut" : "animate__fadeInUp"
-          }
-            animate__faster`}
+    {showModal && selectedRowGlobalIndex !== null && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+    <div
+      className={`bg-pink-200 rounded-xl shadow-xl w-[95%] max-w-2xl p-6 transition-all transform duration-300 
+      animate__animated ${
+        isClosing ? "animate__fadeOutDown" : "animate__fadeInUp"
+      } font-kanit`}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 border-b border-white pb-4 bg-modal-gradient rounded-2xl px-6 py-4">
+        <h2 className="text-3xl font-bold text-white">Edit Caution Row</h2>
+        <button
+          onClick={closeModalWithFade}
+          className="text-white hover:text-red-300 text-3xl font-bold"
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Radio Section */}
+      <div className="mb-6 text-black text-lg">
+        <FormControl>
+          <RadioGroup
+            row
+            value={action}
+            onChange={(e) => setAction(e.target.value)}
           >
-            <div className="bg-modal-gradient w-full rounded-xl px-4 py-3">
-              <h3 className="text-xl font-semibold text-white">
-                Edit Caution Row
-              </h3>
-            </div>
-            <div className="mb-4 mt-2">
-              <label className="block font-kanit mb-1 text-start text-xl ">
-                Select Action:
-              </label>
+            <FormControlLabel
+              value="0"
+              control={<Radio sx={{ transform: "scale(1.3)" }} />}
+              label={<span className="text-xl">Acknowledge</span>}
+              className="mr-6"
+            />
+            <FormControlLabel
+              value="0.5"
+              control={<Radio sx={{ transform: "scale(1.3)" }} />}
+              label={<span className="text-xl">Follow-up</span>}
+              className="mr-6"
+            />
+            <FormControlLabel
+              value="custom"
+              control={<Radio sx={{ transform: "scale(1.3)" }} />}
+              label={<span className="text-xl">Custom</span>}
+              className="mr-6"
+            />
+          </RadioGroup>
+        </FormControl>
+      </div>
 
-              <FormControl className="font-kanit pl-4">
-                <RadioGroup
-                  aria-labelledby="action-radio-label"
-                  name="action"
-                  value={action}
-                  onChange={(e) => setAction(e.target.value)}
-                >
-                  <FormControlLabel
-                    value="0"
-                    control={<Radio />}
-                    label="Acknowledge"
-                  />
-                  <FormControlLabel
-                    value="0.5"
-                    control={<Radio />}
-                    label="Follow-up"
-                  />
-                  <FormControlLabel
-                    value="custom"
-                    control={<Radio />}
-                    label="Custom"
-                  />
-                </RadioGroup>
-              </FormControl>
-            </div>
-
-            {action === "custom" && (
-              <div className="mb-4">
-                <label className="block font-medium mb-1 text-start">
-                  Enter Custom Caution Value:
-                </label>
-                <textarea
-                  className="w-full border border-gray-300 bg-cyan-50 rounded px-3 py-2 text-black"
-                  value={customCaution}
-                  onChange={(e) => setCustomCaution(e.target.value)}
-                  rows={3}
-                />
-              </div>
-            )}
-
-            <div className="mb-4">
-              <label className="block font-medium mb-1 text-start">Note:</label>
-              <textarea
-                className="w-full border border-gray-300 bg-cyan-50 rounded px-3 py-2 text-black"
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={3}
-              />
-            </div>
-
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={closeModalWithFade}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 w-[200px]"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-[200px]"
-              >
-                Save
-              </button>
-            </div>
-          </div>
+      {/* Custom Caution Input */}
+      {action === "custom" && (
+        <div className="mb-6">
+          <label className="block text-xl font-semibold text-black mb-2">
+            Enter Custom Caution
+          </label>
+          <input
+            type="text"
+            value={customCaution}
+            onChange={(e) => setCustomCaution(e.target.value)}
+            className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
+          />
         </div>
       )}
 
-      <div className="w-auto mt-2 flex items-center justify-center px-1">
+      {/* Note Input */}
+      <div className="mb-6">
+        <label className="block text-xl font-semibold text-black mb-2">Note</label>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={3}
+          className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
+        />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-4">
+        <button
+          onClick={closeModalWithFade}
+          className="bg-red-600 text-white text-lg px-6 py-3 mb-2 rounded-full hover:bg-red-700 w-[140px]"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSave}
+          className="bg-green-600 text-white text-lg px-6 py-3 mb-2 mr-2 rounded-full hover:bg-green-700 w-[140px]"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+      <div className="w-auto mt-2 flex items-center justify-center px-1 ">
         <Stack spacing={2}>
           <Pagination
             count={Math.ceil(filteredData.length / pageSize)}
@@ -1227,7 +1265,7 @@ const getRowKey = (row) =>
                 minWidth: "40px", // ลดความกว้าง
                 height: "40px", // ลดความสูง
                 padding: "0px", // ไม่ต้องมี padding
-                margin: "2px", // ลดช่องไฟระหว่างปุ่ม
+                margin: "4px", // ลดช่องไฟระหว่างปุ่ม
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af",

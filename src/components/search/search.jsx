@@ -29,7 +29,7 @@ function SearchBar({ searchTerm, setSearchTerm }) {
 
   return (
    <span >
-  <div className="relative w-[550px] mt-5 ">
+  <div className="relative w-[550px] ">
     <MagnifyingGlassIcon 
       className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-indigo-800" 
     />
