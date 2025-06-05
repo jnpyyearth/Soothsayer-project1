@@ -16,15 +16,25 @@ background: #0B192C;
   -moz-osx-font-smoothing: grayscale;
 }
 
-body {
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+   flex-direction: column;
+}
+
+/* body {
   margin: 0;
   display: flex;
   min-width: 320px;
   min-height: 100vh;
-  flex-direction: column; /* กำหนดให้ child เรียงแนวตั้ง */
-  overflow-x: hidden; /* ซ่อน scrollbar แนวนอน */
-  /* overflow-y: hidden; */
-}
+  flex-direction: column; กำหนดให้ child เรียงแนวตั้ง
+  overflow-x: hidden; ซ่อน scrollbar แนวนอน
+  overflow-y: hidden; 
+}*/
 
 @media (prefers-color-scheme: light) {
   :root {
@@ -42,3 +52,75 @@ body {
 .title-custom{
   font-size: large;
 }
+
+/* ในไฟล์ CSS */
+tr {
+  height: 28px; /* หรือค่าที่เหมาะสมสำหรับ 25 แถว */
+}
+
+.table-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-family: 'Kanit', sans-serif;
+}
+
+.table-header {
+  flex: 0 0 auto;
+  padding: 8px 16px;
+  color: white;
+  background-color: #1e40af;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.table-body-container {
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0 8px;
+}
+
+.table-scroll-area {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.table-scroll-area table {
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.2;
+  border-collapse: collapse;
+  background-color: #e6f7ff;
+}
+
+.table-scroll-area th,
+.table-scroll-area td {
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  white-space: nowrap;
+}
+
+.pagination-container {
+  flex: 0 0 auto;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+}
+
+/* table {
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 6px 12px;
+  white-space: nowrap;
+  border: 1px solid #334155;
+}
+
+table tbody tr:hover {
+  background-color: #334155;
+} */

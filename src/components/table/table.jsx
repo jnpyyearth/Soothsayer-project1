@@ -1,17 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import {
-  UserGroupIcon,
-  CalendarIcon,
-  UserIcon,
-  ChatBubbleLeftEllipsisIcon,
-  EnvelopeOpenIcon,
-  EnvelopeIcon,
-  WrenchScrewdriverIcon,
-  ComputerDesktopIcon,
-  CogIcon,
-  BuildingOffice2Icon,
-  ClockIcon,
-} from "@heroicons/react/24/solid";
+import {UserGroupIcon,CalendarIcon, UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,EnvelopeIcon,
+  WrenchScrewdriverIcon,ComputerDesktopIcon,CogIcon,BuildingOffice2Icon,ClockIcon,} from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
 import Badge from "@mui/material/Badge";
@@ -19,14 +8,10 @@ import Pagination from "@mui/material/Pagination";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import Stack from "@mui/material/Stack";
 import ReactDOMServer from "react-dom/server";
-import {
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-} from "@mui/material";
+import {FormControl,FormLabel,RadioGroup,FormControlLabel,Radio,} from "@mui/material";
 import "react-datepicker/dist/react-datepicker.css";
+import "./table.css"
+
 
 //ฟังก์ชั่นกดนอกบริเวณ area ให้ปิดdropdown หรือ modal
 function useMultipleOutsideClick(dropdowns) {
@@ -466,12 +451,12 @@ function Table() {
         Swal.fire("Error", err.message || "Unknown error occurred", "error");
       });
 
-        setAction("");
-        setCustomCaution("");
-        setNote("");
+    setAction("");
+    setCustomCaution("");
+    setNote("");
 
-        // ปิด modal
-        closeModalWithFade();
+    // ปิด modal
+    closeModalWithFade();
   };
 
   //คีย์เฉพาะของแถว เช่น TIME + PLANT + MACHINE + COMPONENT
@@ -521,14 +506,14 @@ function Table() {
   };
 
   return (
-    <div className="w-screen h-full m-0 p-0">
+    <div className="flex flex-col h-screen w-screen overflow-hidden m-0 p-0">
       <div
-        className="p-8 flex flex-col mx-auto font-kanit w-screen"
+        className="p-10 flex flex-col font-kanit w-screen "
         style={{ tableLayout: "fixed" }}
       >
         <div
-          className="md:w-auto flex-none p-4 md:flex-row 
-      md:space-y-0 z-100 align-top h-full w-full "
+          className="md:w-auto flex-none  py-2 text-center md:flex-row 
+      md:space-y-0 z-100 align-top"
         >
           <Header
             onLogoClick={handleLogoClick}
@@ -540,14 +525,14 @@ function Table() {
           />
         </div>
 
-        <div class="flex-grow overflow-y-auto px-4 pb-2">
+        <div className="flex-none px-4">
           <table
-            className="w-full table-auto text-xs leading-tight sm:text-sm md:text-base overflow-visible md:overflow-x-visible 
+            className="w-full table-auto text-[10px] leading-tight sm:text-sm md:text-base overflow-visible md:overflow-x-visible 
        overflow-x-auto font-kanit "
           >
             <thead className="bg-head-column text-lg text-white ">
-              <tr className="h-9">
-                <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
+              <tr className="h-[20px]">
+                <th className="min-w-[10rem] p-1 border border-cyan-950 md:text-sm lg:text-base">
                   {/* Time dropdown */}
                   <div className="inline-flex space-x-2 items-center">
                     {/* ปุ่มเลือกช่วงเวลา (dropdown) */}
@@ -902,14 +887,14 @@ function Table() {
             </thead>
 
             {/* data in row */}
-            <tbody>
+            <tbody className=" overflow-y-hidden">
               {paginatedData.map((row, index) => {
                 const globalIndex = (currentPage - 1) * pageSize + index;
                 const isSelected = selectedRowGlobalIndex === globalIndex;
                 return (
                   <tr
                     key={globalIndex}
-                    className={`cursor-pointer transition duration-300 ease-in-out sm:text-base md:text-lg h-[36px] ${
+                    className={`cursor-pointer transition duration-300 ease-in-out sm:text-base md:text-lg h-[28px] ${
                       isSelected
                         ? "bg-green-600 text-white "
                         : row.Caution === 1
@@ -927,11 +912,11 @@ function Table() {
                     }}
                   >
                     {/* time row detail */}
-                    <td className="py-2 border-2 border-cyan-950 text-lg ">
+                    <td className="px-0.5 py-0.5 border-2 border-cyan-950 text-lg ">
                       {row.TIME}
                     </td>
                     {/* plant row detail */}
-                    <td className="py-2 border-2 border-cyan-950  text-lg ">
+                    <td className="px-0.5 py-0.5 border-2 border-cyan-950  text-lg ">
                       <div className="flex items-center space-x-2 h-full justify-center">
                         <UserGroupIcon
                           className="w-7 h-7  md:w-7 md:h-7 cursor-pointer rounded-full p-1 bg-blue-600 text-white ml-3"
@@ -1033,13 +1018,13 @@ function Table() {
                         <span>{row.PLANT || "-"}</span>
                       </div>
                     </td>
-                    <td className="py-2 border text-lg border-cyan-950">
+                    <td className="px-0.5 py-0.5 border text-lg border-cyan-950">
                       {row.MACHINE}
                     </td>
-                    <td className="py-2 border text-base border-cyan-950">
+                    <td className="px-0.5 py-0.5 border text-base border-cyan-950">
                       {row.COMPONENT}
                     </td>
-                    <td className="border text-center whitespace-normal border-cyan-950 ">
+                    <td className="px-0.5 py-0.5 border  text-center whitespace-normal border-cyan-950 ">
                       <span className="flex items-center space-x-2 w-auto">
                         <span className="text-base py-2 mx-2 truncate break-words">
                           {row.MODEL}
@@ -1070,8 +1055,10 @@ function Table() {
                                       <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1 ">
                                         <ChatBubbleLeftEllipsisIcon className="w-7 h-7 inline-block " />
                                         <strong> Note: </strong>
-                                        <span className="inline-flex font-kanit items-center  rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1
-                                        break-all ring-gray-500/10 ring-inset ml-1">
+                                        <span
+                                          className="inline-flex font-kanit items-center  rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1
+                                        break-all ring-gray-500/10 ring-inset ml-1"
+                                        >
                                           {noteText}
                                         </span>
                                       </p>
@@ -1137,13 +1124,13 @@ function Table() {
                       </span>
                     </td>
 
-                    <td className="py-2 border text-base border-cyan-950 ">
+                    <td className="px-0.5 py-0.5 border text-base border-cyan-950 ">
                       {row.HEALTHSCORE}
                     </td>
-                    <td className="py-2 border text-base border-cyan-950">
+                    <td className="px-0.5 py-0.5 border text-base border-cyan-950">
                       {row.Actual_Value}
                     </td>
-                    <td className="py-2 border text-base border-cyan-950">
+                    <td className="px-0.5 py-0.5 border text-base border-cyan-950">
                       {row.UNITS}
                     </td>
                   </tr>
@@ -1154,103 +1141,8 @@ function Table() {
         </div>
       </div>
 
-    {showModal && selectedRowGlobalIndex !== null && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-    <div
-      className={`bg-pink-200 rounded-xl shadow-xl w-[95%] max-w-2xl p-6 transition-all transform duration-300 
-      animate__animated ${
-        isClosing ? "animate__fadeOutDown" : "animate__fadeInUp"
-      } font-kanit`}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 border-b border-white pb-4 bg-modal-gradient rounded-2xl px-6 py-4">
-        <h2 className="text-3xl font-bold text-white">Edit Caution Row</h2>
-        <button
-          onClick={closeModalWithFade}
-          className="text-white hover:text-red-300 text-3xl font-bold"
-        >
-          ✕
-        </button>
-      </div>
-
-      {/* Radio Section */}
-      <div className="mb-6 text-black text-lg">
-        <FormControl>
-          <RadioGroup
-            row
-            value={action}
-            onChange={(e) => setAction(e.target.value)}
-          >
-            <FormControlLabel
-              value="0"
-              control={<Radio sx={{ transform: "scale(1.3)" }} />}
-              label={<span className="text-xl">Acknowledge</span>}
-              className="mr-6"
-            />
-            <FormControlLabel
-              value="0.5"
-              control={<Radio sx={{ transform: "scale(1.3)" }} />}
-              label={<span className="text-xl">Follow-up</span>}
-              className="mr-6"
-            />
-            <FormControlLabel
-              value="custom"
-              control={<Radio sx={{ transform: "scale(1.3)" }} />}
-              label={<span className="text-xl">Custom</span>}
-              className="mr-6"
-            />
-          </RadioGroup>
-        </FormControl>
-      </div>
-
-      {/* Custom Caution Input */}
-      {action === "custom" && (
-        <div className="mb-6">
-          <label className="block text-xl font-semibold text-black mb-2">
-            Enter Custom Caution
-          </label>
-          <input
-            type="text"
-            value={customCaution}
-            onChange={(e) => setCustomCaution(e.target.value)}
-            className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
-          />
-        </div>
-      )}
-
-      {/* Note Input */}
-      <div className="mb-6">
-        <label className="block text-xl font-semibold text-black mb-2">Note</label>
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          rows={3}
-          className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
-        />
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex justify-end gap-4">
-        <button
-          onClick={closeModalWithFade}
-          className="bg-red-600 text-white text-lg px-6 py-3 mb-2 rounded-full hover:bg-red-700 w-[140px]"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSave}
-          className="bg-green-600 text-white text-lg px-6 py-3 mb-2 mr-2 rounded-full hover:bg-green-700 w-[140px]"
-        >
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-      <div className="w-auto mt-2 flex items-center justify-center px-1 ">
-        <Stack spacing={2}>
+      <div className="flex justify-center items-center h-[5px] px-2">
+        <Stack spacing={1}>
           <Pagination
             count={Math.ceil(filteredData.length / pageSize)}
             page={currentPage}
@@ -1259,13 +1151,12 @@ function Table() {
               "& .MuiPaginationItem-root": {
                 color: "white",
                 backgroundColor: "#1e40af",
-                borderRadius: "100%",
+                borderRadius: "50%",
                 fontWeight: "bold",
-                fontSize: "16px", // ลดฟอนต์อีกนิด
-                minWidth: "40px", // ลดความกว้าง
-                height: "40px", // ลดความสูง
-                padding: "0px", // ไม่ต้องมี padding
-                margin: "4px", // ลดช่องไฟระหว่างปุ่ม
+                fontSize: "16px", // ← ขยายตัวอักษร
+                minWidth: "44px", // ← ขยายปุ่มกว้าง
+                height: "44px", // ← ขยายปุ่มสูง
+                margin: "4px", // ← เพิ่มระยะห่าง
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af",
@@ -1275,18 +1166,114 @@ function Table() {
               "& .MuiPaginationItem-root:hover": {
                 backgroundColor: "#2563eb",
                 color: "white",
-                cursor: "pointer",
               },
               "& .MuiPagination-ul": {
-                padding: 0, // ลบ padding
-                margin: 0, // ลบ margin
-                gap: "4px", // ควบคุมระยะห่างระหว่างปุ่ม
+                padding: 0,
+                margin: 0,
+                gap: "4px",
               },
             }}
-            color="primary" // อันนี้จะยังมีผลอยู่แต่ถ้า override สีด้วย sx จะมีน้ำหนักมากกว่า
           />
         </Stack>
       </div>
+
+      {showModal && selectedRowGlobalIndex !== null && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+          <div
+            className={`bg-pink-200 rounded-xl shadow-xl w-[95%] max-w-2xl p-6 transition-all transform duration-300 
+      animate__animated ${
+        isClosing ? "animate__fadeOutDown" : "animate__fadeInUp"
+      } font-kanit`}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6 border-b border-white pb-4 bg-modal-gradient rounded-2xl px-6 py-4">
+              <h2 className="text-3xl font-bold text-white">
+                Edit Caution Row
+              </h2>
+              <button
+                onClick={closeModalWithFade}
+                className="text-white hover:text-red-300 text-3xl font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Radio Section */}
+            <div className="mb-6 text-black text-lg">
+              <FormControl>
+                <RadioGroup
+                  row
+                  value={action}
+                  onChange={(e) => setAction(e.target.value)}
+                >
+                  <FormControlLabel
+                    value="0"
+                    control={<Radio sx={{ transform: "scale(1.3)" }} />}
+                    label={<span className="text-xl">Acknowledge</span>}
+                    className="mr-6"
+                  />
+                  <FormControlLabel
+                    value="0.5"
+                    control={<Radio sx={{ transform: "scale(1.3)" }} />}
+                    label={<span className="text-xl">Follow-up</span>}
+                    className="mr-6"
+                  />
+                  <FormControlLabel
+                    value="custom"
+                    control={<Radio sx={{ transform: "scale(1.3)" }} />}
+                    label={<span className="text-xl">Custom</span>}
+                    className="mr-6"
+                  />
+                </RadioGroup>
+              </FormControl>
+            </div>
+
+            {/* Custom Caution Input */}
+            {action === "custom" && (
+              <div className="mb-6">
+                <label className="block text-xl font-semibold text-black mb-2">
+                  Enter Custom Caution
+                </label>
+                <input
+                  type="text"
+                  value={customCaution}
+                  onChange={(e) => setCustomCaution(e.target.value)}
+                  className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
+                />
+              </div>
+            )}
+
+            {/* Note Input */}
+            <div className="mb-6">
+              <label className="block text-xl font-semibold text-black mb-2">
+                Note
+              </label>
+              <textarea
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                rows={3}
+                className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
+              />
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={closeModalWithFade}
+                className="bg-red-600 text-white text-lg px-6 py-3 mb-2 rounded-md hover:bg-red-700 w-[140px]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                className="bg-green-600 text-white text-lg px-6 py-3 mb-2 mr-2 rounded-md hover:bg-green-700 w-[140px]"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

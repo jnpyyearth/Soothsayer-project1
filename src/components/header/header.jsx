@@ -30,10 +30,10 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
  return (
   <div className="px-6 ">
     {/* logo อยู่บรรทัดแรก */}
-<div className="flex justify-center items-center h-auto p-1">
+<div className="flex justify-center items-center h-auto p-3 mt-2 max-h-[50px]">
   <img
     src={logoImage}
-    className="cursor-pointer w-42 h-auto"
+    className="cursor-pointer w-42 h-auto "
     id="logolink"
     alt="logosoothsayer"
     onClick={onLogoClick}
