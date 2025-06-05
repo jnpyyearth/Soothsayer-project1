@@ -3,7 +3,7 @@ import SearchBar from '../search/search';
 import Clearall from '../clear-all/clearall';
 
 
-function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
+function Header({ onLogoClick, data , searchTerm, setSearchTerm,setSelectedRowGlobalIndex }) {
   // สร้าง autocomplete suggestions จาก data
   const allKeywords = [
     ...new Set([
@@ -25,6 +25,7 @@ function Header({ onLogoClick, data , searchTerm, setSearchTerm }) {
 
 const handleClear = () => {
   setSearchTerm(""); // แค่ล้างค่า searchTerm
+   setSelectedRowGlobalIndex(null);
 };
 
  return (

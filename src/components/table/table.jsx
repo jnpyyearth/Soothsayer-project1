@@ -547,6 +547,7 @@ function Table() {
             searchTerm={searchTerm}
             setSearchTerm={handleSearchTermChange}
             className="relative"
+            setSelectedRowGlobalIndex={setSelectedRowGlobalIndex} 
           />
         </div>
 
@@ -921,7 +922,7 @@ function Table() {
                     key={globalIndex}
                     className={`cursor-pointer transition duration-300 ease-in-out sm:text-base md:text-lg h-[28px] ${
                       isSelected
-                        ? "bg-green-600 text-white "
+                        ? "bg-emerald-600 text-white "
                         : row.Caution === 1
                         ? "bg-caution-1 text-white hover:bg-caution-blue-gradient text-lg font-medium font-kanit"
                         : row.Caution === 0.5

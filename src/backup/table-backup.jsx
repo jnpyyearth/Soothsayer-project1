@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import {UserGroupIcon,CalendarIcon, UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,EnvelopeIcon,
+import {UserGroupIcon,CalendarIcon,UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,EnvelopeIcon,
   WrenchScrewdriverIcon,ComputerDesktopIcon,CogIcon,BuildingOffice2Icon,ClockIcon,} from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
@@ -8,10 +8,15 @@ import Pagination from "@mui/material/Pagination";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import Stack from "@mui/material/Stack";
 import ReactDOMServer from "react-dom/server";
-import {FormControl,FormLabel,RadioGroup,FormControlLabel,Radio,} from "@mui/material";
+import {
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
 import "react-datepicker/dist/react-datepicker.css";
-import "./table.css"
-
+import "./table.css";
 
 //ฟังก์ชั่นกดนอกบริเวณ area ให้ปิดdropdown หรือ modal
 function useMultipleOutsideClick(dropdowns) {
@@ -266,6 +271,7 @@ function Table() {
     setSearchTerm(term);
     setCurrentPage(1);
   };
+  
 
   // กรองข้อมูลตามไฟล์ มาไว้ในแต่ละคอลัมน์ แต่ละแถวในตาราง
   const filteredData = data
@@ -505,6 +511,25 @@ function Table() {
     setCurrentPage(page);
   };
 
+  //กดปุ่ม next (->) และ previous (<-) ของ pagination บนคีย์บอร์ดได้
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "ArrowLeft" && currentPage > 1) {
+        setCurrentPage((prev) => prev - 1);
+      } else if (
+        e.key === "ArrowRight" &&
+        currentPage < Math.ceil(filteredData.length / pageSize)
+      ) {
+        setCurrentPage((prev) => prev + 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentPage, filteredData.length]);
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden m-0 p-0">
       <div
@@ -512,7 +537,7 @@ function Table() {
         style={{ tableLayout: "fixed" }}
       >
         <div
-          className="md:w-auto flex-none  py-2 text-center md:flex-row 
+          className="md:w-auto flex-none  py-1 text-center md:flex-row 
       md:space-y-0 z-100 align-top"
         >
           <Header
@@ -525,7 +550,7 @@ function Table() {
           />
         </div>
 
-        <div className="flex-none px-4">
+        <div className="flex-none px-4 py-1">
           <table
             className="w-full table-auto text-[10px] leading-tight sm:text-sm md:text-base overflow-visible md:overflow-x-visible 
        overflow-x-auto font-kanit "
@@ -964,7 +989,7 @@ function Table() {
                               ReactDOMServer.renderToStaticMarkup(htmlContent);
 
                             Swal.fire({
-                              position: "top-end",
+                              position: "top-start",
                               icon: undefined,
                               html: `
                           <div class="rounded-md overflow-hidden shadow-lg w-full max-w-xl">
@@ -973,9 +998,9 @@ function Table() {
                        <svg class="w-8 h-8 text-white inline-block bg-green-600 rounded-full p-1" fill="currentColor" viewBox="0 0 24 24">
                   ${iconHtml}
                   </svg>
-                     <span class="text-white text-xl font-bold font-kanit">Coordinator</span>
+                     <span class="text-white text-2xl font-bold font-kanit">Coordinator</span>
                         </div>
-                       <button id="swalCloseBtn" class="text-white text-2xl font-bold focus:outline-none">&times;</button>
+                       <button id="swalCloseBtn" class="text-white text-5xl font-bold focus:outline-none">&times;</button>
                          </div>
                                  <div class="px-5 py-8 bg-pink-200 text-black ">
                                         ${htmlString}
@@ -1056,8 +1081,8 @@ function Table() {
                                         <ChatBubbleLeftEllipsisIcon className="w-7 h-7 inline-block " />
                                         <strong> Note: </strong>
                                         <span
-                                          className="inline-flex font-kanit items-center  rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1
-                                        break-all ring-gray-500/10 ring-inset ml-1"
+                                          className="inline-flex font-kanit items-center rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1
+                                          break-words break-all whitespace-pre-wrap ring-gray-500/10 ring-inset ml-1"
                                         >
                                           {noteText}
                                         </span>
@@ -1069,10 +1094,10 @@ function Table() {
                                       htmlContent
                                     );
                                   Swal.fire({
-                                    position: "top-end",
+                                    position: "top-start",
                                     icon: undefined,
                                     html: `
-                  <div class="rounded-md overflow-hidden shadow-lg w-full max-w-md">
+                  <div class="rounded-md overflow-hidden shadow-lg w-full max-w-full">
                     <div class="flex items-center justify-between bg-modal-gradient p-4">
                       <div class="flex items-center space-x-2">
                         <svg class="w-8 h-8 text-white inline-block bg-green-600 rounded-full p-1" fill="currentColor" viewBox="0 0 24 24">
@@ -1080,10 +1105,10 @@ function Table() {
                         </svg>
                         <span class="text-white text-xl font-bold font-kanit">Time & Acknowledge</span>
                       </div>
-                      <button id="swalCloseBtn" class="text-white text-2xl font-bold focus:outline-none">&times;</button>
+                      <button id="swalCloseBtn" class="text-white text-4xl font-bold focus:outline-none">&times;</button>
                     </div>
-                    <div class="p-4 bg-violet-100 text-black">
-                      ${htmlString}
+                  <div class="p-4 bg-violet-100 text-black w-full max-w-full break-words">
+                        ${htmlString}
                     </div>
                   </div>
                 `,
@@ -1107,11 +1132,11 @@ function Table() {
                                     },
                                     showClass: {
                                       popup:
-                                        "animate__animated animate__fadeInRight animate__faster",
+                                        "animate__animated animate__fadeInLeft animate__faster",
                                     },
                                     hideClass: {
                                       popup:
-                                        "animate__animated animate__fadeOutRight animate__faster",
+                                        "animate__animated animate__fadeOutLeft animate__faster",
                                     },
                                     willClose: () => {
                                       document.body.style.overflow = "";
@@ -1141,7 +1166,7 @@ function Table() {
         </div>
       </div>
 
-      <div className="flex justify-center items-center h-[5px] px-2">
+      <div className="flex justify-center items-center h-[1px] px-2">
         <Stack spacing={1}>
           <Pagination
             count={Math.ceil(filteredData.length / pageSize)}
@@ -1153,10 +1178,11 @@ function Table() {
                 backgroundColor: "#1e40af",
                 borderRadius: "50%",
                 fontWeight: "bold",
-                fontSize: "16px", // ← ขยายตัวอักษร
-                minWidth: "44px", // ← ขยายปุ่มกว้าง
-                height: "44px", // ← ขยายปุ่มสูง
-                margin: "4px", // ← เพิ่มระยะห่าง
+                fontSize: "20px",
+                minWidth: "44px",
+                height: "44px",
+                padding: "5px",
+                margin: "4px",
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af",
@@ -1170,7 +1196,7 @@ function Table() {
               "& .MuiPagination-ul": {
                 padding: 0,
                 margin: 0,
-                gap: "4px",
+                gap: "5px",
               },
             }}
           />
