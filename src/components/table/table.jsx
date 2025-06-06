@@ -8,11 +8,12 @@ import Pagination from "@mui/material/Pagination";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import Stack from "@mui/material/Stack";
 import ReactDOMServer from "react-dom/server";
+
 import {FormControl,RadioGroup,FormControlLabel,Radio, ToggleButton, ToggleButtonGroup} from "@mui/material";
 import "react-datepicker/dist/react-datepicker.css";
 import "./table.css";
 
-//ฟังก์ชั่นกดนอกบริเวณ area ให้ปิดdropdown หรือ modal
+//ฟังก์ชั่นกดนอก area ให้ปิดdropdown หรือ modal
 function useMultipleOutsideClick(dropdowns) {
   useEffect(() => {
     function handleClickOutside(event) {
@@ -53,7 +54,7 @@ function Table() {
   const pageSize = 25; //กำหนดให้แสดง 25 แถว
   const [selectedRowKey, setSelectedRowKey] = useState(null);
 
-  //ปิด modal ใน 3 วิ
+  //การเคลื่อนที่ปิด modal ใน 3 วิ
   const closeModalWithFade = () => {
     setIsClosing(true);
     setTimeout(() => {
@@ -67,9 +68,7 @@ function Table() {
     setCustomCaution(""); // reset custom caution
     setNote(""); // reset note field
     setSelectedRowGlobalIndex(null); // reset row selection
-    // อย่าทำ fetchData() ถ้าไม่ต้องการโหลดข้อมูลเดิมกลับมา
   };
-
   //array data engineer & officer
   const roleMap = {
     GSP1: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
@@ -77,41 +76,33 @@ function Table() {
     GSP2: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
     GSP3: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
     GSP4: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
-    GSP5: {
-      engineer: "Piyarach Somwatcharajit",
-      officer: "Issarapong Tumhonyam",
-    },
-    GSP6: {
-      engineer: "Piyarach Somwatcharajit",
-      officer: "Issarapong Tumhonyam",
-    },
+    GSP5: {engineer: "Piyarach Somwatcharajit",officer: "Issarapong Tumhonyam",},
+    GSP6: {engineer: "Piyarach Somwatcharajit",officer: "Issarapong Tumhonyam",},
     GPPP: { engineer: "Apichai Mekha", officer: "Issarapong Tumhonyam" },
   };
-
   //dropdown open/close value state
+  //dropdown time & date select
   const [open, setOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState("Select All Time");
-
+  //dropdown plant select 
   const dropdownRef = useRef(null);
   const [plantDropdownOpen, setPlantDropdownOpen] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState("All Plants");
   const plantDropdownRef = useRef(null);
-
+  // dropdown machine select
   const [machineOpen, setmachineopen] = useState(false);
   const [selectedmachine, setSelectedmachine] = useState(" All Machine");
   const machineRef = useRef(null);
-
+  // dropdown components select 
   const [componentsOpen, setComponentopen] = useState(false);
   const [selectedcomponents, setSelectedcomponents] = useState(
     "Select All Components"
   );
   const componentsRef = useRef(null);
-
-  // option dropdown plant-machine-components
+  // option in select dropdown plant-machine-components for filter values it 
   const [plantOptions, setPlantoptions] = useState();
   const [machineOption, setMachineoptions] = useState();
   const [componentsOption, setComponentsoptions] = useState();
-
   // Load plants from data
   useEffect(() => {
     if (data.length > 0) {
@@ -123,7 +114,6 @@ function Table() {
       setPlantoptions([]);
     }
   }, [data]);
-
   //load data plant in row
   useEffect(() => {
     if (selectedPlant && selectedPlant !== "All Plants") {
@@ -405,7 +395,7 @@ function Table() {
         machine: selectedRow.MACHINE,
         component: selectedRow.COMPONENT,
         newCaution: String(newCaution),
-        note: note ?? "",
+        note: note || data[selectedRowGlobalIndex]?.Note || "",
       }),
     })
       .then((res) => res.json())
@@ -504,7 +494,9 @@ function Table() {
   const onPageChange = (e, page) => {
     setCurrentPage(page);
   };
+  
 
+  
   //กดปุ่ม next (->) และ previous (<-) ของ pagination บนคีย์บอร์ดได้
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -723,7 +715,6 @@ function Table() {
                     )}
                   </div>
                 </th>
-
                 {/* Machine dropdown */}
                 <th className="min-w-[10rem] p-1 border border-cyan-950 text-xs md:text-sm lg:text-base">
                   <div className="relative inline-flex" ref={machineRef}>
@@ -1199,161 +1190,175 @@ function Table() {
           />
         </Stack>
       </div>
-
-      {showModal && selectedRowGlobalIndex !== null && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-          <div
-            className={`bg-pink-200 rounded-xl shadow-xl w-[95%] max-w-2xl p-6 transition-all transform duration-300 
-      animate__animated ${
+      
+{showModal && selectedRowGlobalIndex !== null && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+    <div
+      className={`bg-pink-200 rounded-xl shadow-xl w-[95%] max-w-2xl p-6 transition-all transform duration-300 
+        animate__animated ${
         isClosing ? "animate__fadeOutDown" : "animate__fadeInUp"
       } font-kanit`}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6 border-b border-white pb-4 bg-modal-gradient rounded-2xl px-6 py-4">
+        <h2 className="text-3xl font-bold text-white">
+          Edit Caution Row
+        </h2>
+        <button
+          onClick={closeModalWithFade}
+          className="text-white hover:text-red-300 text-3xl font-bold"
+        >
+          ✕
+        </button>
+      </div>
+         
+      {/* Radio Section */}
+      <div className="mb-6 text-black text-lg"> 
+     <div className="mb-3 text-xl text-black text-center">Select Tag</div>
+        <ToggleButtonGroup
+          value={action}
+          exclusive
+          onChange={(e, newValue) => {
+            if (newValue !== null) {
+              const currentCaution = data[selectedRowGlobalIndex]?.Caution;
+              if (parseFloat(newValue) === currentCaution) {
+                Swal.fire({
+                  icon: "warning",
+                  confirmButtonText: "OK",
+                  customClass: {
+                    confirmButton: "bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-5 py-2 rounded",
+                    popup: "font-kanit"
+                  },
+                  html: '<div class="text-xl">ค่า Caution ซ้ำ กรุณาเลือกอีกที</div>'
+                });
+                return;
+              }
+              setAction(newValue);
+              setNote("");
+            }
+          }}
+          sx={{ display: "flex", gap: 2, justifyContent: "center" }}
+        >
+       
+          {/* Acknowledge (Red) */}
+          <ToggleButton
+            value="1"
+            sx={{
+              fontSize: "1.25rem",
+              fontFamily: "kanit , sans-serif",
+              px: 3,
+              py: 1.5,
+              border: "1px solid #ccc",
+              color: "#FFFF",
+              backgroundColor: "#C5172E",
+              "&.Mui-selected": {
+                backgroundColor: "#C5172E",
+                border: "4px solid #06D001",
+                color: "white",
+                "&:hover": { backgroundColor: "#A31D1D" },
+              },
+              "&:hover": { backgroundColor: "#A31D1D" },
+              "&:focus": { outline: "none", boxShadow: "none" },
+              "&.Mui-focusVisible": {
+                outline: "none",
+                boxShadow: "none",
+              },
+            }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6 border-b border-white pb-4 bg-modal-gradient rounded-2xl px-6 py-4">
-              <h2 className="text-3xl font-bold text-white">
-                Edit Caution Row
-              </h2>
-              <button
-                onClick={closeModalWithFade}
-                className="text-white hover:text-red-300 text-3xl font-bold"
-              >
-                ✕
-              </button>
-            </div>
+            Acknowledge
+          </ToggleButton>
 
-            {/* Radio Section */}
-            <div className="mb-6 text-black text-lg">
-              <ToggleButtonGroup
-                value={action}
-                exclusive
-                onChange={(e, newValue) => {
-                  if (newValue !== null) setAction(newValue);
-                }}
-                sx={{ display: "flex", gap: 2 ,justifyContent:"center"}}
-              >
-                <ToggleButton
-                  value="0"
-                  sx={{
-                    fontSize: "1.25rem",
-                    fontFamily:"kanit , sans-serif",
-                    px: 3,
-                    py: 1.5,
-                    border: "1px solid #ccc",
-                    color: "#FFFF",
-                    backgroundColor: "#C5172E",
-                    "&.Mui-selected": {
-                      backgroundColor: "#C5172E", // สีเมื่อถูกเลือก
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: "#A31D1D", // สี hover เมื่อเลือกแล้ว
-                      },
-                    },
-                    "&:hover": {
-                      backgroundColor: "#A31D1D", // สี hover ปกติ
-                    },
-                  }}
-                >
-                  Acknowledge
-                </ToggleButton>
+          {/* Follow-up (Yellow) */}
+          <ToggleButton
+            value="0.5"
+            sx={{
+              fontSize: "1.25rem",
+              fontFamily: "kanit , sans-serif",
+              px: 4,
+              py: 1.5,
+              border: "1px solid #ccc",
+              color: "#FFFF",
+              backgroundColor: "#f2bb05",
+              "&.Mui-selected": {
+                backgroundColor: "#E9A319",
+                border: "4px solid #06D001",
+                color: "white",
+                "&:hover": { backgroundColor: "#FFB22C" },
+              },
+              "&:hover": { backgroundColor: "#E9A319" },
+              "&:focus": { outline: "none", boxShadow: "none" },
+              "&.Mui-focusVisible": {
+                outline: "none",
+                boxShadow: "none",
+              },
+            }}
+          >
+            Follow-up
+          </ToggleButton>
 
-                <ToggleButton
-                  value="0.5"
-                  sx={{
-                    fontSize: "1.25rem",
-                     fontFamily:"kanit , sans-serif",
-                    px: 3,
-                    py: 1.5,
-                    border: "1px solid #ccc",
-                    color: "#FFFF",
-                    backgroundColor: "#f2bb05",
-                    "&.Mui-selected": {
-                      backgroundColor: "#E9A319", // สีเมื่อถูกเลือก
-                      color: "white",
-                      "&:hover": {
-                        backgroundColor: "#E9A319", // สี hover เมื่อเลือกแล้ว
-                      },
-                    },
-                    "&:hover": {
-                      backgroundColor: "#E9A319", // สี hover ปกติ
-                    },
-                  }}
-                >
-                  Follow-up
-                </ToggleButton>
+          {/* Normal (White) */}
+          <ToggleButton
+            value="0"
+            sx={{
+              fontSize: "1.25rem",
+              fontFamily: "kanit , sans-serif",
+              px: 5,
+              py: 1.5,
+              border: "1px solid #ccc",
+              color: "black",
+              backgroundColor: "#FEF9E1",
+              "&.Mui-selected": {
+                backgroundColor: "#f0f0c9",
+                border: "4px solid #06D001",
+                color: "black",
+                "&:hover": { backgroundColor: "#f0f0c9" },
+              },
+              "&:hover": { backgroundColor: "#f0f0c9" },
+              "&:focus": { outline: "none", boxShadow: "none" },
+              "&.Mui-focusVisible": {
+                outline: "none",
+                boxShadow: "none",
+              },
+            }}
+          >
+            Normal
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </div>
 
-                <ToggleButton
-                  value="custom"
-                  sx={{
-                    fontSize: "1.25rem",
-                     fontFamily:"kanit , sans-serif",
-                    px: 3,
-                    py: 1.5,
-                    border: "1px solid #ccc",
-                    color: "black",
-                    backgroundColor: "#FEF9E1",
-                    "&.Mui-selected": {
-                      backgroundColor: "#f0f0c9", // สีเมื่อถูกเลือก
-                      color: "black",
-                      "&:hover": {
-                        backgroundColor: "#f0f0c9", // สี hover เมื่อเลือกแล้ว
-                      },
-                    },
-                    "&:hover": {
-                      backgroundColor: "#f0f0c9", // สี hover ปกติ
-                    },
-                  }}
-                >
-                  Custom
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </div>
+      {/* Note Input */}
+      <div className="mb-6">
+        <label className="block text-xl font-semibold text-black mb-2 ml-2 text-start">
+          Note
+        </label>
+        <textarea
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          rows={3}
+          className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
+        />
+      </div>
 
-            {/* Custom Caution Input */}
-            {action === "custom" && (
-              <div className="mb-6">
-                <label className="block text-xl font-semibold text-black mb-2">
-                  Enter Custom Caution
-                </label>
-                <input
-                  type="text"
-                  value={customCaution}
-                  onChange={(e) => setCustomCaution(e.target.value)}
-                  className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
-                />
-              </div>
-            )}
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-4">
+        <button
+          onClick={closeModalWithFade}
+          className="bg-red-600 text-white text-lg px-6 py-3 mb-2 rounded-md hover:bg-red-700 w-[140px]"
+        >
+          Cancel
+        </button>
+        <button
+          onClick={handleSave}
+          className="bg-green-600 text-white text-lg px-6 py-3 mb-2 mr-2 rounded-md hover:bg-green-700 w-[140px]"
+        >
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+)}
 
-            {/* Note Input */}
-            <div className="mb-6">
-              <label className="block text-xl font-semibold text-black mb-2">
-                Note
-              </label>
-              <textarea
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={3}
-                className="w-full border border-gray-300 bg-cyan-50 px-4 py-3 rounded-lg text-black text-xl focus:ring-2 focus:ring-sky-400 outline-none"
-              />
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={closeModalWithFade}
-                className="bg-red-600 text-white text-lg px-6 py-3 mb-2 rounded-md hover:bg-red-700 w-[140px]"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="bg-green-600 text-white text-lg px-6 py-3 mb-2 mr-2 rounded-md hover:bg-green-700 w-[140px]"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

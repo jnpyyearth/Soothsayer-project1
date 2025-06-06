@@ -18,7 +18,7 @@ function Clearall({ onClear}) {
       >
         CLEAR-ALL  <ArrowPathIcon
           className={`h-7 w-7 ml-2 transition-transform ${
-            isSpinning ? "animate-spin" : ""
+            isSpinning ? "animate-fastSpin" : ""
           }`}
         />
       </button>

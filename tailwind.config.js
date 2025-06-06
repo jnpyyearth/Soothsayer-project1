@@ -56,8 +56,9 @@ export default {
       },
       animation: {
         fadeInSlideIn: 'fadeInSlideIn 0.1s ease-out forwards',
-       
+        fastSpin: 'spin 0.3s linear infinite', 
       },
+      
     },
   },
  

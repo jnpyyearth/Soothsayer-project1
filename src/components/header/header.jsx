@@ -31,7 +31,7 @@ const handleClear = () => {
  return (
    <div className="px-6 ">
      {/* logo อยู่บรรทัดแรก */}
-     <div className="flex justify-center items-center h-auto p-3 mt-2 max-h-[50px]">
+     <div className="flex justify-center items-center h-auto p-3 mt-3 max-h-[50px]">
        <img
          src={logoImage}
          className="cursor-pointer w-42 h-auto "
