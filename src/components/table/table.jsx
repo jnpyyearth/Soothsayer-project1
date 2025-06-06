@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
-import {UserGroupIcon,CalendarIcon,UserIcon,ChatBubbleLeftEllipsisIcon,EnvelopeOpenIcon,EnvelopeIcon,
-  WrenchScrewdriverIcon,ComputerDesktopIcon,CogIcon,BuildingOffice2Icon,ClockIcon,} from "@heroicons/react/24/solid";
+import {UserGroupIcon,CalendarDaysIcon,ChatBubbleBottomCenterTextIcon,EnvelopeOpenIcon,EnvelopeIcon,
+        WrenchScrewdriverIcon,ComputerDesktopIcon,CogIcon,BuildingOffice2Icon,} from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
 import Badge from "@mui/material/Badge";
@@ -8,13 +8,7 @@ import Pagination from "@mui/material/Pagination";
 import PrecisionManufacturingIcon from "@mui/icons-material/PrecisionManufacturing";
 import Stack from "@mui/material/Stack";
 import ReactDOMServer from "react-dom/server";
-import {
-  FormControl,
-  FormLabel,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
-} from "@mui/material";
+import {FormControl,RadioGroup,FormControlLabel,Radio, ToggleButton, ToggleButtonGroup} from "@mui/material";
 import "react-datepicker/dist/react-datepicker.css";
 import "./table.css";
 
@@ -547,7 +541,7 @@ function Table() {
             searchTerm={searchTerm}
             setSearchTerm={handleSearchTermChange}
             className="relative"
-            setSelectedRowGlobalIndex={setSelectedRowGlobalIndex} 
+            setSelectedRowGlobalIndex={setSelectedRowGlobalIndex}
           />
         </div>
 
@@ -1029,11 +1023,11 @@ function Table() {
                               },
                               showClass: {
                                 popup:
-                                  "animate__animated animate__fadeInRight animate__faster",
+                                  "animate__animated animate__fadeInLeft animate__faster",
                               },
                               hideClass: {
                                 popup:
-                                  "animate__animated animate__fadeOutRight animate__faster",
+                                  "animate__animated animate__fadeOutLeft animate__faster",
                               },
                               willClose: () => {
                                 document.body.style.overflow = "";
@@ -1069,7 +1063,7 @@ function Table() {
                                   const htmlContent = (
                                     <div className="mt-2 w-max font-kanit">
                                       <p className="flex items-center gap-2 break-words whitespace-pre-wrap">
-                                        <CalendarIcon className="w-7 h-7 inline-block" />
+                                        <CalendarDaysIcon className="w-9 h-9 inline-block bg-blue-600 text-white p-1 rounded-full" />
                                         <strong>
                                           Acknowledge Time :
                                           <span className="inline-flex items-center  px-2 py-1 text-lg font-bold text-rose-700  my-2 mx-2">
@@ -1078,12 +1072,12 @@ function Table() {
                                         </strong>
                                       </p>
 
-                                      <p className="flex items-center gap-2 break-words whitespace-pre-wrap my-1 ">
-                                        <ChatBubbleLeftEllipsisIcon className="w-7 h-7 inline-block " />
+                                      <p className="flex items-start gap-2 break-words whitespace-pre-wrap my-2 ">
+                                        <ChatBubbleBottomCenterTextIcon className="w-9 h-9 inline-block bg-blue-600 text-white p-1 rounded-full" />
                                         <strong> Note: </strong>
                                         <span
-                                          className="inline-flex font-kanit items-center rounded-full bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1
-                                          break-words break-all whitespace-pre-wrap ring-gray-500/10 ring-inset ml-1"
+                                          className="inline-flex font-kanit text-start items-start rounded-md bg-emerald-700 px-3 py-1 text-lg font-medium text-white ring-1
+                                          break-words whitespace-pre-wrap ring-gray-500/10 ring-inset ml-1 max-w-[600px] "
                                         >
                                           {noteText}
                                         </span>
@@ -1097,8 +1091,9 @@ function Table() {
                                   Swal.fire({
                                     position: "top-start",
                                     icon: undefined,
+                                    width: "auto",
                                     html: `
-                  <div class="rounded-md overflow-hidden shadow-lg w-full max-w-full">
+                  <div class="rounded-md overflow-hidden shadow-lg w-fit max-w-[90vw]">
                     <div class="flex items-center justify-between bg-modal-gradient p-4">
                       <div class="flex items-center space-x-2">
                         <svg class="w-8 h-8 text-white inline-block bg-green-600 rounded-full p-1" fill="currentColor" viewBox="0 0 24 24">
@@ -1118,9 +1113,10 @@ function Table() {
                                     showConfirmButton: false,
                                     background: "transparent",
                                     color: "#ffffff",
-                                    timer: 3000,
+                                    timer: null,
                                     customClass: {
                                       popup: "shadow-none p-0",
+                                      
                                     },
                                     didOpen: () => {
                                       const closeBtn =
@@ -1227,32 +1223,89 @@ function Table() {
 
             {/* Radio Section */}
             <div className="mb-6 text-black text-lg">
-              <FormControl>
-                <RadioGroup
-                  row
-                  value={action}
-                  onChange={(e) => setAction(e.target.value)}
+              <ToggleButtonGroup
+                value={action}
+                exclusive
+                onChange={(e, newValue) => {
+                  if (newValue !== null) setAction(newValue);
+                }}
+                sx={{ display: "flex", gap: 2 ,justifyContent:"center"}}
+              >
+                <ToggleButton
+                  value="0"
+                  sx={{
+                    fontSize: "1.25rem",
+                    fontFamily:"kanit , sans-serif",
+                    px: 3,
+                    py: 1.5,
+                    border: "1px solid #ccc",
+                    color: "#FFFF",
+                    backgroundColor: "#C5172E",
+                    "&.Mui-selected": {
+                      backgroundColor: "#C5172E", // สีเมื่อถูกเลือก
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#A31D1D", // สี hover เมื่อเลือกแล้ว
+                      },
+                    },
+                    "&:hover": {
+                      backgroundColor: "#A31D1D", // สี hover ปกติ
+                    },
+                  }}
                 >
-                  <FormControlLabel
-                    value="0"
-                    control={<Radio sx={{ transform: "scale(1.3)" }} />}
-                    label={<span className="text-xl">Acknowledge</span>}
-                    className="mr-6"
-                  />
-                  <FormControlLabel
-                    value="0.5"
-                    control={<Radio sx={{ transform: "scale(1.3)" }} />}
-                    label={<span className="text-xl">Follow-up</span>}
-                    className="mr-6"
-                  />
-                  <FormControlLabel
-                    value="custom"
-                    control={<Radio sx={{ transform: "scale(1.3)" }} />}
-                    label={<span className="text-xl">Custom</span>}
-                    className="mr-6"
-                  />
-                </RadioGroup>
-              </FormControl>
+                  Acknowledge
+                </ToggleButton>
+
+                <ToggleButton
+                  value="0.5"
+                  sx={{
+                    fontSize: "1.25rem",
+                     fontFamily:"kanit , sans-serif",
+                    px: 3,
+                    py: 1.5,
+                    border: "1px solid #ccc",
+                    color: "#FFFF",
+                    backgroundColor: "#f2bb05",
+                    "&.Mui-selected": {
+                      backgroundColor: "#E9A319", // สีเมื่อถูกเลือก
+                      color: "white",
+                      "&:hover": {
+                        backgroundColor: "#E9A319", // สี hover เมื่อเลือกแล้ว
+                      },
+                    },
+                    "&:hover": {
+                      backgroundColor: "#E9A319", // สี hover ปกติ
+                    },
+                  }}
+                >
+                  Follow-up
+                </ToggleButton>
+
+                <ToggleButton
+                  value="custom"
+                  sx={{
+                    fontSize: "1.25rem",
+                     fontFamily:"kanit , sans-serif",
+                    px: 3,
+                    py: 1.5,
+                    border: "1px solid #ccc",
+                    color: "black",
+                    backgroundColor: "#FEF9E1",
+                    "&.Mui-selected": {
+                      backgroundColor: "#f0f0c9", // สีเมื่อถูกเลือก
+                      color: "black",
+                      "&:hover": {
+                        backgroundColor: "#f0f0c9", // สี hover เมื่อเลือกแล้ว
+                      },
+                    },
+                    "&:hover": {
+                      backgroundColor: "#f0f0c9", // สี hover ปกติ
+                    },
+                  }}
+                >
+                  Custom
+                </ToggleButton>
+              </ToggleButtonGroup>
             </div>
 
             {/* Custom Caution Input */}

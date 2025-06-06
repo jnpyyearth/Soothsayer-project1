@@ -17,6 +17,7 @@
     "@mui/icons-material": "^7.1.0",
     "@mui/material": "^7.1.0",
     "@mui/x-date-pickers": "^8.4.0",
+    "antd": "^5.25.4",
     "datatables.net": "^2.3.0",
     "react": "^19.1.0",
     "react-datepicker": "^8.3.0",
