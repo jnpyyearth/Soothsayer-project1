@@ -13,7 +13,7 @@ import {FormControl,RadioGroup,FormControlLabel,Radio, ToggleButton, ToggleButto
 import "react-datepicker/dist/react-datepicker.css";
 import "./table.css";
 
-//ฟังก์ชั่นกดนอก area ให้ปิดdropdown หรือ modal
+//usemultipleOutsideclick ควบคุมการกดนอก area ให้ปิดdropdown หรือ modal
 function useMultipleOutsideClick(dropdowns) {
   useEffect(() => {
     function handleClickOutside(event) {
@@ -62,13 +62,15 @@ function Table() {
       setIsClosing(false);
     }, 300);
   };
-
+  
+  //reloadpage
   const reloadPage = () => {
     setAction(""); // reset action input
     setCustomCaution(""); // reset custom caution
     setNote(""); // reset note field
     setSelectedRowGlobalIndex(null); // reset row selection
   };
+
   //array data engineer & officer
   const roleMap = {
     GSP1: { engineer: "Apichai Mekha", officer: "Paramee Srisavake" },
@@ -80,86 +82,126 @@ function Table() {
     GSP6: {engineer: "Piyarach Somwatcharajit",officer: "Issarapong Tumhonyam",},
     GPPP: { engineer: "Apichai Mekha", officer: "Issarapong Tumhonyam" },
   };
+
   //dropdown open/close value state
   //dropdown time & date select
   const [open, setOpen] = useState(false);
   const [selectedTime, setSelectedTime] = useState("Select All Time");
-  //dropdown plant select 
+
+  //dropdown plant select
   const dropdownRef = useRef(null);
   const [plantDropdownOpen, setPlantDropdownOpen] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState("All Plants");
   const plantDropdownRef = useRef(null);
+
   // dropdown machine select
   const [machineOpen, setmachineopen] = useState(false);
   const [selectedmachine, setSelectedmachine] = useState(" All Machine");
   const machineRef = useRef(null);
-  // dropdown components select 
+
+  // dropdown components select
   const [componentsOpen, setComponentopen] = useState(false);
-  const [selectedcomponents, setSelectedcomponents] = useState(
-    "Select All Components"
-  );
+  const [selectedcomponents, setSelectedcomponents] = useState("Select All Components");
   const componentsRef = useRef(null);
-  // option in select dropdown plant-machine-components for filter values it 
-  const [plantOptions, setPlantoptions] = useState();
-  const [machineOption, setMachineoptions] = useState();
-  const [componentsOption, setComponentsoptions] = useState();
-  // Load plants from data
+
+  // option ใน select dropdown plant/machine/components ใช้ในการ filter ค่ารายการที่เลือก
+  const [plantOptions, setPlantoptions] = useState([]);
+  const [machineOption, setMachineoptions] = useState([]);
+  const [componentsOption, setComponentsoptions] = useState([]);
+
+
+  // updateOptions และ Selected ค่าที่เลือก ✅
+function updateOptionsAndSelected(options, selected, setOptions) {
+  const safeOptions = Array.isArray(options) ? options : [];
+  const safeSelected = typeof selected === "string" ? selected : "";
+
+  const isAllOption = ["All Plants", "Select All Machine", "All Components"].includes(safeSelected);
+
+  const finalOptions = isAllOption
+    ? safeOptions
+    : safeOptions.includes(safeSelected)
+      ? safeOptions
+      : [...safeOptions, safeSelected];
+
+  setOptions(finalOptions);
+}
+
+
+
+  //set start page show all option ✅
   useEffect(() => {
     if (data.length > 0) {
-      const plants = Array.from(new Set(data.map((row) => row.PLANT))).filter(
-        Boolean
-      );
-      setPlantoptions(plants);
-    } else {
-      setPlantoptions([]);
+      const allPlants = [...new Set(data.map((row) => row.PLANT))].filter( Boolean);
+      const allMachines = [...new Set(data.map((row) => row.MACHINE))].filter(Boolean);
+      const allComponents = [...new Set(data.map((row) => row.COMPONENT)),].filter(Boolean);
+      setPlantoptions(allPlants);
+      setMachineoptions(allMachines);
+      setComponentsoptions(allComponents);
+      // เซ็ตค่าเริ่มต้นด้วย ไม่งั้น useState ยังไม่มีค่าตอน filter
+      setSelectedPlant("All Plants");
+      setSelectedmachine("Select All Machine");
+      setSelectedcomponents("All Components");
     }
   }, [data]);
-  //load data plant in row
-  useEffect(() => {
-    if (selectedPlant && selectedPlant !== "All Plants") {
-      const machines = Array.from(
-        new Set(
-          data
-            .filter((row) => row.PLANT === selectedPlant)
-            .map((row) => row.MACHINE)
-        )
-      ).filter(Boolean);
-      setMachineoptions(machines);
-    } else {
-      setMachineoptions([]);
-    }
-    // รีเซ็ตตัวเลือก machine และ component เมื่อเลือกชื่อ plant ใหม่
-    setSelectedmachine("Select All Machine");
-    setComponentsoptions([]);
-    setSelectedcomponents("Select All Components");
-  }, [selectedPlant, data]);
 
-  // อัปเดต/รีเซ็ตตัวเลือก dropdown-list components เมื่อเลือก machine หรือ Plant ใหม่
-  useEffect(() => {
-    if (
-      selectedPlant &&
-      selectedPlant !== "All Plants" &&
-      selectedmachine &&
-      selectedmachine !== "All Machine"
-    ) {
-      const components = Array.from(
-        new Set(
-          data
-            .filter(
-              (row) =>
-                row.PLANT === selectedPlant && row.MACHINE === selectedmachine
-            )
-            .map((row) => row.COMPONENT)
-        )
-      ).filter(Boolean);
-      setComponentsoptions(components);
-    } else {
-      setComponentsoptions([]);
-    }
-    // รีเซ็ตตัวเลือก dropdown-list component เมื่อได้เลือกชื่อ machine ใหม่
+
+  // ฟิลเตอร์เมื่อเลือก COMPONENT dropdown ✅
+useEffect(() => {
+  if (selectedmachine === "Select All Machine") return;
+
+  const filteredData = data.filter(
+    (row) =>
+      row.MACHINE === selectedmachine &&
+      (selectedPlant === "All Plants" || row.PLANT === selectedPlant)
+  );
+
+  const components = [...new Set(filteredData.map(row => row.COMPONENT))].filter(Boolean);
+
+  // รีค่า selectedcomponents ถ้าอันเก่าไม่อยู่ใน options ใหม่
+  if (!components.includes(selectedcomponents)) {
     setSelectedcomponents("All Components");
-  }, [selectedmachine, selectedPlant, data]);
+  }
 
+  updateOptionsAndSelected(components, selectedcomponents, setComponentsoptions);
+}, [selectedmachine, selectedPlant, data, selectedcomponents]);
+
+
+
+  // ฟิลเตอร์เมื่อเลือก PLANT dropdown ✅
+useEffect(() => {
+  const filteredData = data.filter(
+    (row) => selectedPlant === "All Plants" || row.PLANT === selectedPlant
+  );
+
+  const filteredMachines = [...new Set(filteredData.map((row) => row.MACHINE))].filter(Boolean);
+  const filteredComponents = [...new Set(filteredData.map((row) => row.COMPONENT))].filter(Boolean);
+
+  updateOptionsAndSelected(filteredMachines, selectedmachine, setMachineoptions);
+  updateOptionsAndSelected(filteredComponents, selectedcomponents, setComponentsoptions);
+
+  const allPlants = [...new Set(data.map((row) => row.PLANT))].filter(Boolean);
+  updateOptionsAndSelected(allPlants, selectedPlant, setPlantoptions);
+}, [selectedPlant, data, selectedmachine, selectedcomponents]);
+
+
+
+  // ฟิลเตอร์เมื่อเลือก MACHINE dropdown ✅
+ useEffect(() => {
+  if (selectedmachine === "Select All Machine") return;
+
+  const filteredData = data.filter((row) =>
+    row.MACHINE === selectedmachine
+  );
+
+  const components = [...new Set(filteredData.map(row => row.COMPONENT))].filter(Boolean);
+  updateOptionsAndSelected(components, selectedcomponents, setComponentsoptions);
+
+  const allPlants = [...new Set(data.map((row) => row.PLANT))].filter(Boolean);
+  updateOptionsAndSelected(allPlants, selectedPlant, setPlantoptions);
+}, [selectedmachine, data, selectedcomponents, selectedPlant]);
+
+
+  
   //fetch api
   const fetchData = () => {
     fetch("/get_data")
@@ -185,6 +227,7 @@ function Table() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
 
   // ตั้งค่า dropdown โดยใช้ Hook "useMemo" ให้จดจำค่าที่รับจากตัวแปรหรือค่าของarray
   //ในกรณีนี้จะเก็บค่าของ plant machine และ components ที่มีข้อมูลที่เชื่อมโยงซึ่งกันและกัน
@@ -229,56 +272,149 @@ function Table() {
     setCurrentPage(1);
   };
 
-  const handleSelectPlant = (plant) => {
-    setSelectedPlant(plant);
-    setPlantDropdownOpen(false);
-    setSelectedRowGlobalIndex(null);
-    setCurrentPage(1);
-  };
 
-  const handleSelectmachine = (machine) => {
-    setSelectedmachine(machine);
-    setmachineopen(false);
-    setSelectedRowGlobalIndex(null);
-    setCurrentPage(1);
-  };
+  //handleselect plant✅
+const handleSelectPlant = (plant) => {
+  setSelectedPlant(plant);
+  setPlantDropdownOpen(false);
+  setSelectedRowGlobalIndex(null);
+  setCurrentPage(1);
 
-  const handleSelectcomponent = (component) => {
-    setSelectedcomponents(component);
-    setComponentopen(false);
-    setSelectedRowGlobalIndex(null);
-    setCurrentPage(1);
-  };
+  if (plant === "All Plants") {
+    // รีเซ็ต machine และ component เมื่อเลือก All Plants
+    setSelectedmachine("Select All Machine");
+    setSelectedcomponents("All Components");
+
+    const allMachines = [...new Set(data.map(row => row.MACHINE))].filter(Boolean);
+    const allComponents = [...new Set(data.map(row => row.COMPONENT))].filter(Boolean);
+    setMachineoptions(allMachines);
+    setComponentsoptions(allComponents);
+  } else {
+    //  กรอง machine และ component ที่อยู่ภายใน plant นั้น
+    const filteredByPlant = data.filter(row => row.PLANT === plant);
+
+    // ถ้ามี machine/component ที่เลือกไว้ แต่ไม่อยู่ใน plant ใหม่ → รีเซ็ต
+    const validMachines = [...new Set(filteredByPlant.map(row => row.MACHINE))].filter(Boolean);
+    const validComponents = [...new Set(filteredByPlant.map(row => row.COMPONENT))].filter(Boolean);
+
+    if (!validMachines.includes(selectedmachine)) {
+      setSelectedmachine("Select All Machine");
+    }
+    if (!validComponents.includes(selectedcomponents)) {
+      setSelectedcomponents("All Components");
+    }
+
+    setMachineoptions(validMachines);
+    setComponentsoptions(validComponents);
+  }
+};
+
+//handleselectmachine ✅
+const handleSelectmachine = (machine) => {
+  setSelectedmachine(machine);
+  setmachineopen(false);
+  setSelectedRowGlobalIndex(null);
+  setCurrentPage(1);
+
+  // รีเซ็ต Component ทันทีเมื่อเปลี่ยน Machine
+  setSelectedcomponents("All Components");
+
+  if (machine === "Select All Machine") {
+    const filteredData = data.filter(
+      (row) => selectedPlant === "All Plants" || row.PLANT === selectedPlant
+    );
+    const allComponents = [...new Set(filteredData.map(row => row.COMPONENT))].filter(Boolean);
+    setComponentsoptions(allComponents);
+  } else {
+    const filteredByMachine = data.filter(row => row.MACHINE === machine);
+
+    // Auto select plant หากยังเป็น All
+    if (selectedPlant === "All Plants" && filteredByMachine.length > 0) {
+      setSelectedPlant(filteredByMachine[0].PLANT);
+    }
+
+    const filteredComponents = filteredByMachine
+      .filter(row => selectedPlant === "All Plants" || row.PLANT === selectedPlant)
+      .map(row => row.COMPONENT);
+
+    const uniqueComponents = [...new Set(filteredComponents)].filter(Boolean);
+    setComponentsoptions(uniqueComponents);
+  }
+};
+
+
+
+//handle select component ✅
+const handleSelectcomponent = (component) => {
+  setSelectedcomponents(component);
+  setComponentopen(false);
+  setSelectedRowGlobalIndex(null);
+  setCurrentPage(1);
+
+  if (component === "All Components") {
+    const filteredData = data.filter(
+      (row) => selectedPlant === "All Plants" || row.PLANT === selectedPlant
+    );
+    const allMachines = [...new Set(filteredData.map(row => row.MACHINE))].filter(Boolean);
+    setMachineoptions(allMachines);
+  } else {
+    const filteredByComponent = data.filter(row => row.COMPONENT === component);
+
+    // ถ้า Plant ยังเป็น All ให้เซ็ต Plant ตาม Component แรกที่เจอ
+    if (selectedPlant === "All Plants" && filteredByComponent.length > 0) {
+      const newPlant = filteredByComponent[0].PLANT;
+      setSelectedPlant(newPlant);
+    }
+
+    // กรอง Machines ตาม component ที่เลือกและ plant ที่เลือกอยู่
+    const filteredMachines = filteredByComponent
+      .filter(row => selectedPlant === "All Plants" || row.PLANT === selectedPlant)
+      .map(row => row.MACHINE);
+
+    const uniqueMachines = [...new Set(filteredMachines)].filter(Boolean);
+    setMachineoptions(uniqueMachines);
+  }
+};
+
 
   //setting การเสิร์ช
   const handleSearchTermChange = (term) => {
     setSearchTerm(term);
     setCurrentPage(1);
   };
-  
 
   // กรองข้อมูลตามไฟล์ มาไว้ในแต่ละคอลัมน์ แต่ละแถวในตาราง
   const filteredData = data
     .filter((row) => {
       const matchTime = isTimeInRange(row.TIME, selectedTime);
       let rowDateOnly = "";
+
       if (row.TIME) {
-        // แปลงวันที่จากรูปแบบ DD/MM/YYYY เป็น YYYY-MM-DD
-        const [day, month, year] = row.TIME.split(" ")[0].split("/");
-        rowDateOnly = `${year}-${month.padStart(2, "0")}-${day.padStart(
-          2,
-          "0"
-        )}`;
+        // ใช้ new Date() แปลง 'row.TIME' ที่มีรูปแบบ 'YYYY-MM-DD HH:mm:ss' ให้เป็น Date object
+        const date = new Date(row.TIME); // แปลงจาก '2025-05-10 22:00:00' เป็น Date object
+
+        // ตรวจสอบว่า 'row.TIME' ถูกแปลงเป็น Date ได้ถูกต้องหรือไม่
+        if (!isNaN(date.getTime())) {
+          // แปลงเป็น 'YYYY-MM-DD' โดยไม่สนใจเวลา
+          rowDateOnly = date.toISOString().split("T")[0]; // จะได้ '2025-05-10'
+        } else {
+          console.error(`Invalid date format: ${row.TIME}`);
+        }
       }
+
       const matchDate = selectedDate === "" || rowDateOnly === selectedDate;
+
       const matchPlant =
         selectedPlant === "All Plants" || row.PLANT === selectedPlant;
-      const matchComponent =
-        selectedcomponents === "All Components" ||
-        row.COMPONENT === selectedcomponents;
+
       const matchMachine =
         selectedmachine === "Select All Machine" ||
         row.MACHINE === selectedmachine;
+
+      const matchComponent =
+        selectedcomponents === "All Components" ||
+        row.COMPONENT === selectedcomponents;
+
       const lowerSearch = searchTerm.toLowerCase();
       const matchSearch =
         !searchTerm ||
@@ -295,46 +431,23 @@ function Table() {
         matchSearch
       );
     })
-    // filter sort ข้อมูลแสดงเดือนล่าสุดก่อน โดยมีการเรียงค่าcaution
     .sort((a, b) => {
-      // เรียง Caution ก่อน
-      const cautionOrder = b.Caution - a.Caution;
-      if (cautionOrder !== 0) return cautionOrder;
+      // ฟังก์ชั่นการเรียงข้อมูลตามวันและเวลา (ล่าสุดก่อน)
+      const dateA = new Date(a.TIME);
+      const dateB = new Date(b.TIME);
 
-      // แปลงแค่วันที่ (โดยไม่เอาเวลามาคิด)
-      function parseDate(dateTimeStr) {
-        if (!dateTimeStr) return new Date(0);
-        const [datePart] = dateTimeStr.split(" ");
-        const [day, month, year] = datePart.split("/");
-        const dayPadded = day.padStart(2, "0");
-        const monthPadded = month.padStart(2, "0");
-        return new Date(`${year}-${monthPadded}-${dayPadded}`);
-      }
-
-      // แปลงเวลาเฉพาะชั่วโมงและนาที (แปลงเป็นนาที)
-      function parseTimeInMinutes(dateTimeStr) {
-        if (!dateTimeStr) return 0;
-        const parts = dateTimeStr.split(" ");
-        const timePart = parts.length > 1 ? parts[1] : "00:00";
-        const [hh, mm] = timePart.split(":");
-        return parseInt(hh) * 60 + parseInt(mm);
-      }
-
-      const dateA = parseDate(a.TIME);
-      const dateB = parseDate(b.TIME);
-
-      // ถ้าวันต่างกัน ให้เรียงวันที่ (เดือนล่าสุดก่อน)
       if (dateB.getTime() !== dateA.getTime()) {
-        return dateB - dateA;
+        return dateB - dateA; // เรียงจากวันที่ล่าสุดก่อน
       }
 
-      // ถ้าวันเดียวกัน ให้เรียงเวลาจากมากไปน้อย (ชั่วโมงล่าสุดก่อน)
-      const timeA = parseTimeInMinutes(a.TIME);
-      const timeB = parseTimeInMinutes(b.TIME);
-      return timeB - timeA;
+      const timeA =
+        new Date(a.TIME).getHours() * 60 + new Date(a.TIME).getMinutes();
+      const timeB =
+        new Date(b.TIME).getHours() * 60 + new Date(b.TIME).getMinutes();
+
+      return timeB - timeA; // ถ้าวันเดียวกัน เรียงจากเวลา (ชั่วโมงล่าสุดก่อน)
     });
 
-  //ฟิลเตอร์การรีโหลดหน้า
   const paginatedData = filteredData.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -387,21 +500,22 @@ function Table() {
     }
 
     const originalNote = selectedRow.Note?.trim() || "";
-const currentNote = note?.trim() || "";
+    const currentNote = note?.trim() || "";
 
-if (selectedRow.Caution === newCaution && currentNote === originalNote) {
-  Swal.fire({
-    icon: "info",
-    title: "No Changes",
-    text: "ไม่มีการเปลี่ยนแปลง กรุณาแก้ไขข้อมูลก่อนบันทึก",
-    confirmButtonText: "OK",
-    customClass: {
-      confirmButton: "bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-5 py-2 rounded",
-      popup: "font-kanit"
+    if (selectedRow.Caution === newCaution && currentNote === originalNote) {
+      Swal.fire({
+        icon: "info",
+        title: "No Changes",
+        text: "ไม่มีการเปลี่ยนแปลง กรุณาแก้ไขข้อมูลก่อนบันทึก",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton:
+            "bg-yellow-500 hover:bg-yellow-600 text-white font-bold px-5 py-2 rounded",
+          popup: "font-kanit",
+        },
+      });
+      return;
     }
-  });
-  return;
-}
 
     fetch("http://localhost:5000/update_row", {
       method: "POST",
@@ -511,9 +625,7 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
   const onPageChange = (e, page) => {
     setCurrentPage(page);
   };
-  
 
-  
   //กดปุ่ม next (->) และ previous (<-) ของ pagination บนคีย์บอร์ดได้
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -549,6 +661,9 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
             data={data}
             searchTerm={searchTerm}
             setSearchTerm={handleSearchTermChange}
+            setSelectedPlant={setSelectedPlant}
+            setSelectedmachine={setSelectedmachine}
+            setSelectedcomponents={setSelectedcomponents}
             className="relative"
             setSelectedRowGlobalIndex={setSelectedRowGlobalIndex}
           />
@@ -698,8 +813,8 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
                     {plantDropdownOpen && (
                       <div
                         className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
-                   left-1/2 transform -translate-x-1/2
-                    z-10 mt-2 min-w-[300px] origin-top-right rounded-md shadow-md
+                   left-1/2 -translate-x-[43%]
+                    z-10 mt-12 min-w-[300px] origin-top-right rounded-md shadow-md
                      dark:bg-indigo-950
                     max-h-60 overflow-auto"
                         role="menu"
@@ -769,8 +884,8 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
                     {machineOpen && (
                       <div
                         className="hs-dropdown-menu transition-[opacity,margin] duration absolute 
-                     left-1/2 transform -translate-x-1/2 z-10 mt-2 min-w-fit origin-top-right rounded-md bg-white shadow-md
-                     dark:bg-indigo-950 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
+                    left-1/2 -translate-x-[20%] z-10 mt-12 min-w-fit origin-top-right rounded-md bg-white shadow-md
+                     dark:bg-indigo-950 dark:border dark:border-neutral-700 max-h-65 overflow-visible"
                         role="menu"
                         aria-orientation="vertical"
                         aria-labelledby="hs-dropdown-hover-event"
@@ -781,7 +896,7 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
                               className="grid gap-1 p-1 max-h-80 overflow-auto"
                               style={{
                                 gridTemplateColumns: `repeat(${
-                                  machineOption.length <= 4 ? 1 : 2
+                                  machineOption.length <= 5 ? 1 : 5
                                 }, 1fr)`, // ถ้ามี 4 หรือ น้อยกว่านั้น ให้แสดง 1 คอลัมน์
                                 // ถ้ามีมากกว่า 4 ตัว ให้แสดง 2 คอลัมน์
                               }}
@@ -851,21 +966,23 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
                       <div
                         className="hs-dropdown-menu transition-[opacity,margin] duration absolute z-10 
                     mt-2 min-w-fit origin-top-center h-auto
-             rounded-md bg-white shadow-md dark:bg-indigo-950 dark:border dark:border-neutral-700 max-h-60 overflow-visible"
+             rounded-md bg-white shadow-md dark:bg-indigo-950 dark:border dark:border-neutral-700 max-h-auto overflow-visible"
                         role="menu"
                         aria-orientation="vertical"
                         aria-labelledby="hs-dropdown-hover-event"
                         style={{ left: "50%", transform: "translateX(-50%)" }}
                       >
-                        <div className="p-1 space-y-1 overflow-x-auto">
+                        <div className="p-1 space-y-1 overflow-x-auto ">
                           <div className="min-w-max">
                             <div
                               className="grid gap-1 p-1 max-h-80 overflow-auto"
                               style={{
                                 gridTemplateColumns: `repeat(${
-                                  componentsOption.length <= 4 ? 1 : 2
+                                  (componentsOption.length <= 5 ? 1 : 4,
+                                  componentsOption.length <= 5 ? 1 : 4)
                                 }, 1fr)`, // ถ้ามี 4 หรือ น้อยกว่านั้น ให้แสดง 1 คอลัมน์,
                                 // ถ้ามากกว่า4 ให้แสดง 2 คอลัมน์
+                                //ใช้การประกาศเงื่อนไขแบบ ternary operator
                               }}
                             >
                               <button
@@ -1233,18 +1350,29 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
               <div className="mb-3 text-xl text-black text-center">
                 Select Tag
               </div>
+
               <ToggleButtonGroup
                 value={action}
                 exclusive
+                disableRipple
+                disableFocusRipple
                 onChange={(e, newValue) => {
                   if (newValue !== null) {
                     setAction(newValue);
                   }
                 }}
-                sx={{ display: "flex", gap: 2, justifyContent: "center" }}
+                sx={{
+                  "& .MuiToggleButton-root": {
+                    borderRadius: "8px !important",
+                  },
+                  display: "flex",
+                  gap: 2,
+                  justifyContent: "center",
+                }}
               >
                 {/* Acknowledge (Red) */}
                 <ToggleButton
+                  className="rounded-md"
                   value="1"
                   sx={{
                     fontSize: "1.25rem",
@@ -1254,6 +1382,8 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
                     border: "1px solid #ccc",
                     color: "#FFFF",
                     backgroundColor: "#C5172E",
+                    borderRadius: "12px",
+
                     "&.Mui-selected": {
                       backgroundColor: "#C5172E",
                       border: "4px solid #06D001",
@@ -1282,6 +1412,7 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
                     border: "1px solid #ccc",
                     color: "#FFFF",
                     backgroundColor: "#f2bb05",
+                    borderRadius: "12px",
                     "&.Mui-selected": {
                       backgroundColor: "#E9A319",
                       border: "4px solid #06D001",
@@ -1308,15 +1439,16 @@ if (selectedRow.Caution === newCaution && currentNote === originalNote) {
                     px: 5,
                     py: 1.5,
                     border: "1px solid #ccc",
+                    borderRadius: "12px",
                     color: "black",
-                    backgroundColor: "#FEF9E1",
+                    backgroundColor: "#f8f9fa",
                     "&.Mui-selected": {
-                      backgroundColor: "#f0f0c9",
+                      backgroundColor: "#f8f9fa",
                       border: "4px solid #06D001",
                       color: "black",
-                      "&:hover": { backgroundColor: "#f0f0c9" },
+                      "&:hover": { backgroundColor: "#f6fff8" },
                     },
-                    "&:hover": { backgroundColor: "#f0f0c9" },
+                    "&:hover": { backgroundColor: "#f6fff8" },
                     "&:focus": { outline: "none", boxShadow: "none" },
                     "&.Mui-focusVisible": {
                       outline: "none",

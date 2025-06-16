@@ -11,11 +11,8 @@ export default {
         audiowide: ['Audiowide', 'cursive'],
         content: ['Oxanium', 'cursive'],
         kanit: ['Kanit', 'sans-serif'],
-
-        
       },
       
-
       // ใช้ gradient แบบกำหนดเอง
       backgroundImage: {
         "form-modal-gradient": 
