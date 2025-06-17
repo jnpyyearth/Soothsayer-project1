@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import {UserGroupIcon,CalendarDaysIcon,ChatBubbleBottomCenterTextIcon,EnvelopeOpenIcon,EnvelopeIcon,
-        WrenchScrewdriverIcon,ComputerDesktopIcon,CogIcon,BuildingOffice2Icon,} from "@heroicons/react/24/solid";
+        WrenchScrewdriverIcon,ComputerDesktopIcon,CogIcon,BuildingOffice2Icon,ClockIcon} from "@heroicons/react/24/solid";
 import Swal from "sweetalert2";
 import Header from "../header/header";
 import Badge from "@mui/material/Badge";
@@ -125,8 +125,6 @@ function updateOptionsAndSelected(options, selected, setOptions) {
 
   setOptions(finalOptions);
 }
-
-
 
   //set start page show all option ✅
   useEffect(() => {
@@ -694,7 +692,8 @@ const handleSelectcomponent = (component) => {
                         aria-expanded={open ? "true" : "false"}
                         aria-label="Dropdown"
                         onClick={() => setOpen(!open)}
-                      >
+                      > 
+                        <ClockIcon className="h-"/>
                         {selectedTime}
                         <svg
                           className={`size-4 transition-transform ${
@@ -1039,14 +1038,14 @@ const handleSelectcomponent = (component) => {
                 return (
                   <tr
                     key={globalIndex}
-                    className={`cursor-pointer transition duration-300 ease-in-out sm:text-base md:text-lg h-[28px] ${
+                    className={`cursor-pointer  sm:text-base md:text-lg h-[28px] ${
                       isSelected
                         ? "bg-emerald-600 text-white "
                         : row.Caution === 1
                         ? "bg-caution-1 text-white hover:bg-caution-blue-gradient text-lg font-medium font-kanit"
                         : row.Caution === 0.5
                         ? "bg-yellow-500 text-black hover:bg-caution-blue-gradient text-lg font-medium "
-                        : "bg-caution-0 marker: text-black hover:bg-caution-blue-gradient font-light text-base"
+                        : "bg-caution-0 : text-black hover:bg-caution-blue-gradient font-light text-base"
                     }`}
                     onClick={() => setSelectedRowGlobalIndex(globalIndex)}
                     // เลือกแถว + เปิด modal edit ทันที
@@ -1294,6 +1293,13 @@ const handleSelectcomponent = (component) => {
             page={currentPage}
             onChange={(e, page) => onPageChange(e, page)}
             sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              mt: 4,
+              mb: 4 , // ระยะห่างด้านบน
+              transform: "translateY(-8px)",
+
               "& .MuiPaginationItem-root": {
                 color: "white",
                 backgroundColor: "#1e40af",
@@ -1303,7 +1309,6 @@ const handleSelectcomponent = (component) => {
                 minWidth: "44px",
                 height: "44px",
                 padding: "5px",
-                margin: "4px",
               },
               "& .MuiPaginationItem-root.Mui-selected": {
                 color: "#1e40af",
